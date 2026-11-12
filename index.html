@@ -2,11 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบกู้ยืมเงิน & ร่างสัญญากฎหมายอัตโนมัติ (A4 PDF & Database Sync)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THAI LEGAL LOAN • ระบบร่างสัญญากู้ยืมเงินอัตโนมัติ (A4 PDF & Cloud Sync)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Sarabun (ฟอนต์มาตรฐานเอกสารราชการ/กฎหมายไทย) และ Prompt -->
+    <!-- Google Fonts: Prompt (UI) และ Sarabun (เอกสารกฎหมาย) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -22,17 +22,17 @@
                         legal: ['Sarabun', 'serif'],
                     },
                     colors: {
-                        navy: {
-                            50: '#f0f4f8',
-                            100: '#d9e2ec',
-                            700: '#1e3a8a',
-                            800: '#172554',
-                            900: '#0f172a',
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
                         },
-                        gold: {
-                            400: '#fbbf24',
-                            500: '#d97706',
-                            600: '#b45309',
+                        slate: {
+                            850: '#172033',
+                            950: '#0b1120',
                         }
                     }
                 }
@@ -41,50 +41,78 @@
     </script>
 
     <style>
-        /* สไตล์เฉพาะสำหรับเอกสาร A4 และลายน้ำ */
-        body {
+        /* ล็อกความสูงหน้าจอหลักให้พอดี 100dvh สไตล์ Modern Web App */
+        html, body {
+            height: 100dvh;
+            overflow: hidden;
             background-color: #f1f5f9;
         }
 
+        /* Custom Scrollbar ที่เรียบหรู */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* พื้นหลังตารางจุด (Dot Grid) สำหรับฝั่งพรีวิวเอกสาร */
+        .preview-canvas-bg {
+            background-color: #e2e8f0;
+            background-image: radial-gradient(#cbd5e1 1.25px, transparent 1.25px);
+            background-size: 20px 20px;
+        }
+
+        /* กระดาษมาตรฐาน A4 (210mm x 297mm) */
         .a4-page {
             width: 210mm;
+            height: 297mm;
             min-height: 297mm;
-            background: white;
+            background: #ffffff;
             margin: 0 auto 24px auto;
-            padding: 20mm 22mm;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 18mm 20mm;
+            box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.16), 0 0 1px 1px rgba(15, 23, 42, 0.06);
             position: relative;
             overflow: hidden;
             font-family: 'Sarabun', serif;
-            color: #111827;
-            line-height: 1.75;
+            color: #0f172a;
+            line-height: 1.72;
             font-size: 15.5px;
             box-sizing: border-box;
+            border-radius: 2px;
         }
 
-        /* ลายน้ำ (Watermark) เอียง 45 องศา บนทุกหน้ากระดาษ */
+        /* ลายน้ำ (Watermark) ชื่อผู้กู้พาดเฉียงทุกหน้ากระดาษ */
         .watermark-layer {
             position: absolute;
-            top: -20%;
-            left: -20%;
-            width: 140%;
-            height: 140%;
+            top: -25%;
+            left: -25%;
+            width: 150%;
+            height: 150%;
             pointer-events: none;
             z-index: 10;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            transform: rotate(-38deg);
+            transform: rotate(-36deg);
             user-select: none;
-            opacity: 0.085; /* จางๆ แต่มองเห็นชัดเจนทั้งหน้าจอและตอนพิมพ์ */
+            opacity: 0.075;
         }
 
         .watermark-row {
             white-space: nowrap;
             font-family: 'Sarabun', sans-serif;
             font-weight: 700;
-            font-size: 26px;
-            color: #0f172a;
+            font-size: 25px;
+            color: #1e293b;
             letter-spacing: 3px;
             text-align: center;
         }
@@ -92,35 +120,37 @@
         .contract-content {
             position: relative;
             z-index: 20;
+            height: 100%;
         }
 
         .dotted-fill {
-            border-bottom: 1px dotted #374151;
+            border-bottom: 1px dotted #475569;
             padding: 0 6px;
             font-weight: 600;
             color: #0f172a;
             display: inline-block;
-            min-width: 60px;
+            min-width: 50px;
         }
 
-        /* สไตล์สำหรับโหมดพรีวิวเต็มจอ */
-        .preview-modal-backdrop {
-            background-color: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(4px);
+        /* Backdrop สำหรับ Modal */
+        .glass-backdrop {
+            background-color: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(6px);
         }
 
-        /* CSS สำหรับสั่งพิมพ์ / บันทึกเป็นไฟล์ PDF ขนาด A4 */
+        /* การตั้งค่าเมื่อสั่งพิมพ์ / บันทึกเป็นไฟล์ PDF ขนาด A4 */
         @media print {
             @page {
                 size: A4 portrait;
                 margin: 0;
             }
-            body {
-                background: white !important;
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background: #ffffff !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            /* ซ่อน UI ทั้งหมด ยกเว้นส่วนเอกสาร A4 */
             .no-print {
                 display: none !important;
             }
@@ -130,7 +160,6 @@
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                background: white !important;
             }
             .a4-page {
                 width: 210mm !important;
@@ -139,6 +168,7 @@
                 margin: 0 !important;
                 padding: 18mm 20mm !important;
                 box-shadow: none !important;
+                border-radius: 0 !important;
                 page-break-after: always;
                 break-after: page;
                 -webkit-print-color-adjust: exact !important;
@@ -149,412 +179,497 @@
                 break-after: auto;
             }
             .watermark-layer {
-                opacity: 0.09 !important;
+                opacity: 0.085 !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased">
+<body class="flex flex-col text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
 
-    <!-- Top Navigation Bar -->
-    <header class="no-print bg-navy-900 text-white shadow-lg sticky top-0 z-40 border-b border-amber-500/30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-amber-500/20 border border-amber-400/50 p-2 rounded-xl text-amber-400">
-                    <i data-lucide="scale" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight flex items-center gap-2">
-                        THAI LEGAL LOAN <span class="text-xs bg-amber-500 text-navy-900 px-2 py-0.5 rounded-full font-semibold">PRO</span>
-                    </h1>
-                    <p class="text-xs text-slate-300 hidden sm:block">ระบบฟอร์มกู้ยืมเงิน & ร่างสัญญากฎหมายอัตโนมัติ (A4 Watermark & DB Sync)</p>
-                </div>
+    <!-- Top Application Bar (ความสูง 56px คงที่) -->
+    <header class="no-print h-14 bg-slate-950 text-white px-4 lg:px-6 flex items-center justify-between border-b border-slate-800 shrink-0 z-30">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-brand-500/25">
+                <i data-lucide="scale" class="w-5 h-5 text-white"></i>
             </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-sm sm:text-base tracking-tight">THAI LEGAL LOAN</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">Smart Contract</span>
+                </div>
+                <p class="text-[11px] text-slate-400 hidden sm:block leading-none mt-0.5">ระบบร่างสัญญากู้ยืมเงินอัตโนมัติ • มาตรฐาน A4 & Cloud Sync</p>
+            </div>
+        </div>
 
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button onclick="openGuideModal()" class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 transition">
-                    <i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>
-                    <span class="hidden md:inline">วิธีเชื่อม Google Form/Sheets</span>
-                </button>
-                <button onclick="openHistoryModal()" class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 transition relative">
-                    <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
-                    <span>ประวัติ (<span id="history-count">0</span>)</span>
-                </button>
-                <button onclick="openFullPreview()" class="text-xs sm:text-sm bg-amber-500 hover:bg-amber-400 text-navy-900 font-semibold px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition">
-                    <i data-lucide="file-text" class="w-4 h-4"></i>
-                    <span>พรีวิว & PDF (A4)</span>
-                </button>
-            </div>
+        <!-- Global Toolbar Actions -->
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="fillSampleData()" class="hidden md:flex items-center gap-1.5 text-xs bg-slate-800/90 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700/80 transition">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>ใส่ข้อมูลตัวอย่าง</span>
+            </button>
+
+            <button type="button" onclick="openCloudSettingsModal()" class="flex items-center gap-1.5 text-xs bg-slate-800/90 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700/80 transition">
+                <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="hidden sm:inline">ตั้งค่า Google Form/DB</span>
+                <span class="sm:hidden">เชื่อมต่อ</span>
+            </button>
+
+            <button type="button" onclick="openHistoryModal()" class="flex items-center gap-1.5 text-xs bg-slate-800/90 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700/80 transition">
+                <i data-lucide="folder-clock" class="w-3.5 h-3.5 text-brand-400"></i>
+                <span class="hidden sm:inline">ประวัติ</span>
+                <span id="history-count" class="bg-brand-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">0</span>
+            </button>
+
+            <button type="button" onclick="openFullPreview()" class="flex items-center gap-1.5 text-xs bg-brand-600 hover:bg-brand-500 text-white font-medium px-3.5 py-1.5 rounded-lg shadow-md shadow-brand-600/20 transition">
+                <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
+                <span>พรีวิว & PDF</span>
+            </button>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="no-print max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- Main Split-Pane Workspace (ความสูงเต็มพื้นที่ที่เหลือพอดีเป๊ะ) -->
+    <main class="no-print flex-1 flex overflow-hidden relative">
 
-            <!-- ฝั่งซ้าย: ฟอร์มกรอกข้อมูล (5 คอลัมน์) -->
-            <div class="lg:col-span-5 space-y-5">
+        <!-- ==================== ฝั่งซ้าย: แผงกรอกข้อมูลแบบ Stepper (42% บน Desktop) ==================== -->
+        <section id="leftPane" class="w-full lg:w-[44%] xl:w-[42%] bg-white border-r border-slate-200 flex flex-col h-full z-20">
 
-                <!-- แถบเครื่องมือด่วน -->
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-sm font-semibold text-navy-900 flex items-center gap-1.5">
-                        <i data-lucide="edit-3" class="w-4 h-4 text-amber-500"></i> กรอกข้อมูลทำสัญญา
-                    </span>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="fillSampleData()" class="text-xs bg-navy-50 hover:bg-navy-100 text-navy-800 font-medium px-3 py-1.5 rounded-lg transition">
-                            ใส่ข้อมูลตัวอย่าง
-                        </button>
-                        <button type="button" onclick="resetForm()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium px-3 py-1.5 rounded-lg transition">
-                            ล้างฟอร์ม
+            <!-- แถบ Progress และ Stepper Tabs -->
+            <div class="px-5 pt-4 pb-3 border-b border-slate-100 bg-slate-50/60 shrink-0">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-slate-700">ความคืบหน้าการร่างสัญญา</span>
+                        <span id="completionBadge" class="text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200">0%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="fillSampleData()" class="md:hidden text-[11px] text-brand-600 font-medium hover:underline">ตัวอย่าง</button>
+                        <button type="button" onclick="resetForm()" class="text-[11px] text-slate-400 hover:text-rose-600 flex items-center gap-1 transition">
+                            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> ล้างข้อมูล
                         </button>
                     </div>
                 </div>
 
-                <form id="loanForm" class="space-y-5" onsubmit="handleSaveAndSync(event)">
+                <!-- Progress Bar -->
+                <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-3.5">
+                    <div id="completionBar" class="h-full bg-gradient-to-r from-brand-500 to-emerald-500 transition-all duration-300 rounded-full" style="width: 15%"></div>
+                </div>
 
-                    <!-- 1. ข้อมูลผู้ให้กู้ -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                            <div class="w-7 h-7 rounded-lg bg-navy-900 text-amber-400 flex items-center justify-center font-bold text-sm">1</div>
-                            <h2 class="font-semibold text-navy-900">ข้อมูลผู้ให้กู้ (เจ้าหนี้)</h2>
-                        </div>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อ-นามสกุล ผู้ให้กู้ <span class="text-rose-500">*</span></label>
-                                <input type="text" id="lenderName" required placeholder="เช่น นายธนากร มั่งคั่ง" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 focus:border-navy-700 outline-none transition">
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">เลขบัตรประชาชน (13 หลัก)</label>
-                                    <input type="text" id="lenderIdCard" maxlength="17" placeholder="1-1000-00000-00-0" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">อายุ (ปี)</label>
-                                    <input type="number" id="lenderAge" min="20" max="120" placeholder="เช่น 42" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">ที่อยู่ตามทะเบียนบ้าน</label>
-                                <textarea id="lenderAddress" rows="2" placeholder="บ้านเลขที่ ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none"></textarea>
-                            </div>
-                        </div>
-                    </div>
+                <!-- 4 Stepper Pills -->
+                <div class="grid grid-cols-4 gap-1.5">
+                    <button type="button" onclick="goToStep(1)" id="stepBtn-1" class="step-pill flex flex-col items-center py-2 px-1 rounded-xl border text-center transition">
+                        <span class="text-[10px] font-bold uppercase tracking-wider opacity-75">ขั้นที่ 1</span>
+                        <span class="text-xs font-semibold truncate w-full">ผู้ให้กู้</span>
+                    </button>
+                    <button type="button" onclick="goToStep(2)" id="stepBtn-2" class="step-pill flex flex-col items-center py-2 px-1 rounded-xl border text-center transition">
+                        <span class="text-[10px] font-bold uppercase tracking-wider opacity-75">ขั้นที่ 2</span>
+                        <span class="text-xs font-semibold truncate w-full">ผู้กู้ (ลายน้ำ)</span>
+                    </button>
+                    <button type="button" onclick="goToStep(3)" id="stepBtn-3" class="step-pill flex flex-col items-center py-2 px-1 rounded-xl border text-center transition">
+                        <span class="text-[10px] font-bold uppercase tracking-wider opacity-75">ขั้นที่ 3</span>
+                        <span class="text-xs font-semibold truncate w-full">ยอดเงินกู้</span>
+                    </button>
+                    <button type="button" onclick="goToStep(4)" id="stepBtn-4" class="step-pill flex flex-col items-center py-2 px-1 rounded-xl border text-center transition">
+                        <span class="text-[10px] font-bold uppercase tracking-wider opacity-75">ขั้นที่ 4</span>
+                        <span class="text-xs font-semibold truncate w-full">พยาน & บันทึก</span>
+                    </button>
+                </div>
+            </div>
 
-                    <!-- 2. ข้อมูลผู้กู้ (นำไปทำลายน้ำอัตโนมัติ) -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border-2 border-amber-400/60 space-y-4 relative">
-                        <span class="absolute -top-2.5 right-4 bg-amber-500 text-navy-900 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                            ชื่อผู้กู้จะแสดงเป็นลายน้ำทุกหน้า A4
+            <!-- พื้นที่ฟอร์มเลื่อนขึ้นลงเฉพาะฝั่งซ้าย -->
+            <form id="loanForm" onsubmit="handleSaveAndSync(event)" class="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+
+                <!-- STEP 1: ข้อมูลผู้ให้กู้ (เจ้าหนี้) -->
+                <div id="stepPanel-1" class="step-panel space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">1. ข้อมูลผู้ให้กู้ (เจ้าหนี้)</h2>
+                            <p class="text-xs text-slate-500">ระบุข้อมูลบุคคลหรือนิติบุคคลผู้มอบเงินกู้</p>
+                        </div>
+                        <span class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
                         </span>
-                        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                            <div class="w-7 h-7 rounded-lg bg-amber-500 text-navy-900 flex items-center justify-center font-bold text-sm">2</div>
-                            <h2 class="font-semibold text-navy-900">ข้อมูลผู้กู้ (ลูกหนี้)</h2>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-นามสกุล ผู้ให้กู้ <span class="text-rose-500">*</span></label>
+                            <input type="text" id="lenderName" required placeholder="เช่น นายธนากร มั่งคั่ง" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 outline-none transition">
                         </div>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อ-นามสกุล ผู้กู้ <span class="text-rose-500">*</span></label>
-                                <input type="text" id="borrowerName" required placeholder="เช่น นายสมชาย ใจดี (แสดงเป็นลายน้ำ)" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition font-medium">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">เลขบัตรประจำตัวประชาชน</label>
+                                <input type="text" id="lenderIdCard" maxlength="17" placeholder="1-1000-00000-00-0" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 outline-none font-mono">
                             </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">อายุ (ปี)</label>
+                                <input type="number" id="lenderAge" min="20" max="120" placeholder="42" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">ที่อยู่ตามทะเบียนบ้าน</label>
+                            <textarea id="lenderAddress" rows="2" placeholder="บ้านเลขที่ หมู่ ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 outline-none"></textarea>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 space-y-3">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">เลขบัตรประชาชน (13 หลัก) <span class="text-rose-500">*</span></label>
-                                    <input type="text" id="borrowerIdCard" required maxlength="17" placeholder="1-2000-00000-00-0" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">เลขที่สัญญา (อัตโนมัติ)</label>
+                                    <input type="text" id="contractNumber" class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 font-mono font-semibold text-slate-700">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">เบอร์โทรศัพท์ติดต่อ <span class="text-rose-500">*</span></label>
-                                    <input type="tel" id="borrowerPhone" required placeholder="081-234-5678" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">อายุ (ปี)</label>
-                                    <input type="number" id="borrowerAge" min="20" max="120" placeholder="35" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none">
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">อาชีพ / สถานที่ทำงาน</label>
-                                    <input type="text" id="borrowerJob" placeholder="เช่น พนักงานบริษัท / ค้าขาย" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">วันที่ทำสัญญา <span class="text-rose-500">*</span></label>
+                                    <input type="date" id="contractDate" required class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">ที่อยู่ตามทะเบียนบ้าน / ที่อยู่ปัจจุบัน <span class="text-rose-500">*</span></label>
-                                <textarea id="borrowerAddress" required rows="2" placeholder="บ้านเลขที่ หมู่ ซอย ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">สถานที่ทำสัญญา</label>
+                                <input type="text" id="contractLocation" placeholder="เช่น บ้านเลขที่ 88/12 แขวงจอมพล เขตจตุจักร กรุงเทพมหานคร" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- 3. รายละเอียดการกู้ยืมเงิน -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                            <div class="w-7 h-7 rounded-lg bg-navy-900 text-amber-400 flex items-center justify-center font-bold text-sm">3</div>
-                            <h2 class="font-semibold text-navy-900">รายละเอียดสัญญากู้ยืมเงิน</h2>
+                <!-- STEP 2: ข้อมูลผู้กู้ (ลูกหนี้) & ลายน้ำ -->
+                <div id="stepPanel-2" class="step-panel hidden space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">2. ข้อมูลผู้กู้ (ลูกหนี้)</h2>
+                            <p class="text-xs text-slate-500">ชื่อผู้กู้จะถูกสร้างเป็นลายน้ำป้องกันการปลอมแปลงทุกหน้า</p>
                         </div>
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">เลขที่สัญญา (อัตโนมัติ)</label>
-                                    <input type="text" id="contractNumber" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 font-mono text-slate-700">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">วันที่ทำสัญญา <span class="text-rose-500">*</span></label>
-                                    <input type="date" id="contractDate" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">สถานที่ทำสัญญา</label>
-                                <input type="text" id="contractLocation" placeholder="เช่น บ้านเลขที่ 99/9 แขวงจตุจักร เขตจตุจักร กรุงเทพมหานคร" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">จำนวนเงินกู้ (บาท) <span class="text-rose-500">*</span></label>
-                                    <input type="number" id="loanAmount" required min="1" step="0.01" placeholder="50000" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none font-bold text-navy-900">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">อัตราดอกเบี้ยต่อปี (%)</label>
-                                    <div class="relative">
-                                        <input type="number" id="interestRate" min="0" max="15" step="0.01" value="15" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                        <span class="absolute right-3 top-2 text-xs text-slate-400">สูงสุด 15%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-navy-50 p-2.5 rounded-xl border border-navy-100">
-                                <span class="text-[11px] text-slate-500 block">จำนวนเงินตัวอักษร (แปลงอัตโนมัติ):</span>
-                                <span id="thaiBahtPreview" class="text-xs font-semibold text-navy-900">-</span>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">วันครบกำหนดชำระคืน <span class="text-rose-500">*</span></label>
-                                    <input type="date" id="dueDate" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">รูปแบบการชำระคืน</label>
-                                    <select id="paymentMethod" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none bg-white">
-                                        <option value="ชำระคืนเต็มจำนวนพร้อมดอกเบี้ยภายในวันครบกำหนด">ชำระคืนเต็มจำนวนครั้งเดียว</option>
-                                        <option value="ผ่อนชำระเป็นรายเดือน ทุกวันที่ 25 ของเดือน">ผ่อนชำระเป็นรายเดือน</option>
-                                        <option value="โอนเข้าบัญชีธนาคารของผู้ให้กู้ตามที่ระบุ">โอนเข้าบัญชีธนาคารผู้ให้กู้</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">หลักประกัน / หมายเหตุเพิ่มเติม (ถ้ามี)</label>
-                                <input type="text" id="collateral" placeholder="เช่น ไม่มีหลักประกัน / โฉนดที่ดินเลขที่... / ทะเบียนรถ..." class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อพยานคนที่ 1</label>
-                                    <input type="text" id="witness1" placeholder="ระบุชื่อ-นามสกุลพยาน" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อพยานคนที่ 2</label>
-                                    <input type="text" id="witness2" placeholder="ระบุชื่อ-นามสกุลพยาน" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-700 outline-none">
-                                </div>
-                            </div>
-                        </div>
+                        <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                        </span>
                     </div>
 
-                    <!-- 4. ตั้งค่าการส่งข้อมูลเข้า Google Form / ฐานข้อมูล -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">4</div>
-                                <h2 class="font-semibold text-navy-900">เชื่อมต่อฐานข้อมูล / Google Form</h2>
-                            </div>
-                            <span id="syncModeBadge" class="text-[11px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-medium">โหมดจำลอง + LocalDB</span>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">
-                                    Google Form Action URL / Google Apps Script Web App URL / Webhook
-                                </label>
-                                <input type="url" id="webhookUrl" placeholder="https://docs.google.com/forms/d/e/.../formResponse หรือ https://script.google.com/macros/s/..." class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 outline-none font-mono">
-                                <p class="text-[11px] text-slate-500 mt-1">
-                                    * หากเว้นว่างไว้ ระบบจะบันทึกข้อมูลลงฐานข้อมูลจำลองในเบราว์เซอร์ (LocalStorage) และแสดง JSON Payload ที่พร้อมส่งทันที
-                                </p>
-                            </div>
-
-                            <!-- Optional Google Form Field Mapping -->
-                            <details class="text-xs bg-slate-50 rounded-xl p-3 border border-slate-200">
-                                <summary class="font-medium text-slate-700 cursor-pointer select-none">ตั้งค่า Entry ID สำหรับ Google Form (คลิกเพื่อขยาย)</summary>
-                                <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <div>
-                                        <label class="text-[11px] text-slate-500">Entry ชื่อผู้กู้</label>
-                                        <input type="text" id="entryBorrowerName" placeholder="entry.1000001" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
-                                    </div>
-                                    <div>
-                                        <label class="text-[11px] text-slate-500">Entry เลขบัตรผู้กู้</label>
-                                        <input type="text" id="entryBorrowerId" placeholder="entry.1000002" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
-                                    </div>
-                                    <div>
-                                        <label class="text-[11px] text-slate-500">Entry เบอร์โทร</label>
-                                        <input type="text" id="entryBorrowerPhone" placeholder="entry.1000003" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
-                                    </div>
-                                    <div>
-                                        <label class="text-[11px] text-slate-500">Entry จำนวนเงินกู้</label>
-                                        <input type="text" id="entryLoanAmount" placeholder="entry.1000004" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
-                                    </div>
-                                </div>
-                            </details>
-                        </div>
+                    <!-- Banner แจ้งเตือนลายน้ำ -->
+                    <div class="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 flex items-start gap-2.5">
+                        <i data-lucide="stamp" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                        <p class="text-xs text-amber-900 leading-relaxed">
+                            <b>ระบบลายน้ำอัตโนมัติ:</b> ชื่อ-นามสกุลผู้กู้ที่กรอกด้านล่างจะปรากฏเป็นลายน้ำสีจางพาดเฉียงบนกระดาษ A4 ทุกหน้าทันที
+                        </p>
                     </div>
 
-                    <!-- ปุ่ม Action หลัก -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 pb-8">
-                        <button type="button" onclick="openFullPreview()" class="w-full py-3.5 px-4 bg-white hover:bg-slate-50 text-navy-900 font-semibold rounded-2xl border-2 border-navy-900 shadow-sm flex items-center justify-center gap-2 transition">
-                            <i data-lucide="printer" class="w-5 h-5 text-navy-900"></i>
-                            <span>พรีวิว & ดาวน์โหลด PDF</span>
+                    <div class="space-y-3.5">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-นามสกุล ผู้กู้ <span class="text-rose-500">*</span></label>
+                            <input type="text" id="borrowerName" required placeholder="เช่น นายสมชาย ใจดี" class="w-full px-3.5 py-2.5 text-sm rounded-xl border-2 border-amber-300 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none font-semibold text-slate-900">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">เลขบัตรประชาชน (13 หลัก) <span class="text-rose-500">*</span></label>
+                                <input type="text" id="borrowerIdCard" required maxlength="17" placeholder="1-2000-00000-00-0" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ <span class="text-rose-500">*</span></label>
+                                <input type="tel" id="borrowerPhone" required placeholder="081-234-5678" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">อายุ (ปี)</label>
+                                <input type="number" id="borrowerAge" min="20" max="120" placeholder="34" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">อาชีพ / ตำแหน่งงาน</label>
+                                <input type="text" id="borrowerJob" placeholder="เช่น พนักงานบริษัท / ธุรกิจส่วนตัว" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">ที่อยู่ตามทะเบียนบ้าน / ที่อยู่ปัจจุบัน <span class="text-rose-500">*</span></label>
+                            <textarea id="borrowerAddress" required rows="2" placeholder="บ้านเลขที่ หมู่ ซอย ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: ยอดเงินกู้ & อัตราดอกเบี้ย -->
+                <div id="stepPanel-3" class="step-panel hidden space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">3. จำนวนเงินกู้ & เงื่อนไขดอกเบี้ย</h2>
+                            <p class="text-xs text-slate-500">ระบบแปลงจำนวนเงินเป็นคำอ่านภาษาไทยถูกต้องตามกฎหมาย</p>
+                        </div>
+                        <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="banknote" class="w-4 h-4"></i>
+                        </span>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-medium text-slate-700">จำนวนเงินที่กู้ยืม (บาท) <span class="text-rose-500">*</span></label>
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="setQuickAmount(10000)" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-600 px-2 py-0.5 rounded-md font-medium transition">10,000</button>
+                                    <button type="button" onclick="setQuickAmount(50000)" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-600 px-2 py-0.5 rounded-md font-medium transition">50,000</button>
+                                    <button type="button" onclick="setQuickAmount(100000)" class="text-[10px] bg-slate-100 hover:bg-brand-50 hover:text-brand-600 px-2 py-0.5 rounded-md font-medium transition">100,000</button>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="loanAmount" required min="1" step="0.01" placeholder="0.00" class="w-full pl-4 pr-12 py-3 text-lg rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 outline-none font-bold text-slate-900">
+                                <span class="absolute right-4 top-3.5 text-xs font-semibold text-slate-400">บาท</span>
+                            </div>
+                            <!-- กล่องแสดงคำอ่านภาษาไทยอัตโนมัติ -->
+                            <div class="mt-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 flex items-center justify-between">
+                                <span class="text-[11px] text-slate-500">คำอ่านตัวอักษร:</span>
+                                <span id="thaiBahtPreview" class="text-xs font-semibold text-brand-700">ศูนย์บาทถ้วน</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="text-xs font-medium text-slate-700">ดอกเบี้ยต่อปี (%)</label>
+                                    <span class="text-[10px] text-emerald-600 font-medium">กฎหมายไม่เกิน 15%</span>
+                                </div>
+                                <input type="number" id="interestRate" min="0" max="15" step="0.01" value="15" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">วันครบกำหนดชำระคืน <span class="text-rose-500">*</span></label>
+                                <input type="date" id="dueDate" required class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- การ์ดสรุปยอดดอกเบี้ยเบื้องต้น -->
+                        <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl p-3.5 flex items-center justify-between shadow-sm">
+                            <div>
+                                <span class="text-[11px] text-slate-300 block">ประมาณการดอกเบี้ย (ต่อปี)</span>
+                                <span id="estYearlyInterest" class="text-sm font-bold text-amber-400">0.00 บาท / ปี</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-300 block">อากรแสตมป์ที่ต้องติด</span>
+                                <span id="estStampDuty" class="text-sm font-bold text-emerald-400">0 บาท</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">เงื่อนไขการชำระคืน</label>
+                            <select id="paymentMethod" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none bg-white">
+                                <option value="ชำระคืนเต็มจำนวนพร้อมดอกเบี้ยภายในวันครบกำหนด">ชำระคืนเต็มจำนวนพร้อมดอกเบี้ยภายในวันครบกำหนด</option>
+                                <option value="ผ่อนชำระเป็นรายเดือน ทุกวันที่ 25 ของเดือน จนกว่าจะครบถ้วน">ผ่อนชำระเป็นรายเดือน ทุกวันที่ 25 ของเดือน</option>
+                                <option value="โอนชำระเข้าบัญชีธนาคารของผู้ให้กู้ตามที่ระบุไว้">โอนชำระเข้าบัญชีธนาคารของผู้ให้กู้</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: หลักประกัน พยาน และการบันทึกข้อมูล -->
+                <div id="stepPanel-4" class="step-panel hidden space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">4. หลักประกัน พยาน & บันทึกข้อมูล</h2>
+                            <p class="text-xs text-slate-500">ตรวจสอบพยานลงนามและกดบันทึกเพื่อส่งเข้าฐานข้อมูล</p>
+                        </div>
+                        <span class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                            <i data-lucide="pen-tool" class="w-4 h-4"></i>
+                        </span>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">หลักประกัน / ข้อตกลงเพิ่มเติม (ถ้ามี)</label>
+                            <input type="text" id="collateral" placeholder="เช่น ไม่มีหลักประกัน / โฉนดที่ดินเลขที่... / ทะเบียนรถ..." class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-นามสกุล พยานคนที่ 1</label>
+                                <input type="text" id="witness1" placeholder="ระบุชื่อพยานคนที่ 1" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-นามสกุล พยานคนที่ 2</label>
+                                <input type="text" id="witness2" placeholder="ระบุชื่อพยานคนที่ 2" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-brand-600 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- การ์ดสถานะการเชื่อมต่อ Cloud / Google Form -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                                    <i data-lucide="cloud-upload" class="w-4 h-4 text-emerald-600"></i>
+                                    ปลายทางบันทึกข้อมูล (Database / Google Form)
+                                </span>
+                                <button type="button" onclick="openCloudSettingsModal()" class="text-[11px] text-brand-600 font-semibold hover:underline">ตั้งค่า URL</button>
+                            </div>
+                            <p id="cloudDestinationSummary" class="text-[11px] text-slate-500">
+                                บันทึกลงฐานข้อมูลในระบบ (LocalDB) + พร้อมส่ง JSON Webhook
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- Footer Navigation ของฟอร์ม (ติดด้านล่างฝั่งซ้ายเสมอ) -->
+            <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+                <button type="button" id="prevStepBtn" onclick="changeStep(-1)" class="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-40 disabled:pointer-events-none">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>ย้อนกลับ</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" id="nextStepBtn" onclick="changeStep(1)" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+                        <span>ถัดไป</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+
+                    <button type="submit" form="loanForm" id="submitBtn" class="hidden px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        <span>บันทึก & ส่งข้อมูล</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ฝั่งขวา: Live A4 Document Canvas (58% บน Desktop) ==================== -->
+        <section id="rightPane" class="hidden lg:flex flex-1 flex-col h-full preview-canvas-bg relative overflow-hidden">
+
+            <!-- แถบควบคุมการซูมและเปลี่ยนหน้ากระดาษ (Floating Top Bar) -->
+            <div class="h-12 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 flex items-center justify-between shrink-0 z-10">
+                <div class="flex items-center gap-2">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs font-semibold text-slate-700">เอกสารสัญญาขนาด A4 (2 หน้า)</span>
+                    <span class="hidden xl:inline text-[11px] text-slate-400">• อัปเดตอัตโนมัติตามข้อมูลที่พิมพ์</span>
+                </div>
+
+                <!-- Zoom & Page Controls -->
+                <div class="flex items-center gap-1.5">
+                    <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                        <button type="button" onclick="adjustZoom(-0.08)" title="ย่อขนาด" class="p-1.5 hover:bg-white rounded-md text-slate-600 transition">
+                            <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
                         </button>
-                        <button type="submit" id="submitBtn" class="w-full py-3.5 px-4 bg-navy-900 hover:bg-navy-800 text-white font-semibold rounded-2xl shadow-lg shadow-navy-900/20 flex items-center justify-center gap-2 transition">
-                            <i data-lucide="send" class="w-5 h-5 text-amber-400"></i>
-                            <span>บันทึกข้อมูล & ส่งฐานข้อมูล</span>
+                        <span id="zoomLevelText" class="text-[11px] font-mono font-semibold text-slate-700 px-2 min-w-[46px] text-center">70%</span>
+                        <button type="button" onclick="adjustZoom(0.08)" title="ขยายขนาด" class="p-1.5 hover:bg-white rounded-md text-slate-600 transition">
+                            <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button type="button" onclick="autoFitZoom()" title="ปรับขนาดให้พอดีหน้าจอ" class="px-2 py-1 text-[11px] font-medium hover:bg-white rounded-md text-brand-600 border-l border-slate-200 ml-0.5 transition">
+                            พอดีจอ
                         </button>
                     </div>
 
-                </form>
+                    <button type="button" onclick="triggerPrintPDF()" class="ml-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+                        <i data-lucide="printer" class="w-3.5 h-3.5 text-amber-400"></i>
+                        <span>พิมพ์ / PDF</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- ฝั่งขวา: Live Preview สัญญาขนาด A4 (7 คอลัมน์) -->
-            <div class="lg:col-span-7">
-                <div class="bg-slate-200/80 p-4 rounded-2xl border border-slate-300">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <h3 class="text-sm font-semibold text-navy-900">ตัวอย่างเอกสารสัญญากู้ยืมเงิน (ขนาด A4 มาตรฐาน 2 หน้า)</h3>
-                        </div>
-                        <button onclick="openFullPreview()" class="text-xs bg-navy-900 text-white px-3 py-1.5 rounded-lg hover:bg-navy-800 flex items-center gap-1.5 transition">
-                            <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> ขยายเต็มจอ / สั่งพิมพ์ PDF
-                        </button>
-                    </div>
-
-                    <!-- Container ย่อส่วนสำหรับหน้าจอเล็กให้แสดง A4 สวยงามไม่ล้น -->
-                    <div class="overflow-x-auto pb-2 flex justify-center">
-                        <div id="live-preview-wrapper" class="origin-top scale-[0.52] sm:scale-[0.72] md:scale-[0.82] lg:scale-[0.68] xl:scale-[0.78]" style="height: 1580px;">
-                            <!-- เอกสาร A4 จะถูก Render ที่นี่ -->
-                            <div id="contract-document-container"></div>
-                        </div>
+            <!-- พื้นที่เลื่อนดูเอกสาร A4 (คำนวณความสูงอัตโนมัติตาม Zoom ไม่เกิดพื้นที่ว่างเกิน) -->
+            <div id="previewScrollContainer" class="flex-1 overflow-auto py-6 px-4 flex justify-center items-start">
+                <div id="zoomStage" class="relative transition-all duration-150">
+                    <div id="live-preview-wrapper" class="origin-top-left">
+                        <div id="contract-document-container"></div>
                     </div>
                 </div>
             </div>
 
-        </div>
+        </section>
+
     </main>
 
-    <!-- Fullscreen A4 Preview & Print Modal -->
-    <div id="previewModal" class="no-print fixed inset-0 z-50 hidden preview-modal-backdrop overflow-y-auto">
-        <div class="sticky top-0 z-50 bg-navy-900 text-white px-4 py-3 shadow-xl border-b border-slate-700 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <i data-lucide="file-check-2" class="w-6 h-6 text-amber-400"></i>
+    <!-- Mobile Bottom Switcher Bar (แสดงเฉพาะบนมือถือ/แท็บเล็ต < 1024px) -->
+    <nav class="no-print lg:hidden h-14 bg-white border-t border-slate-200 grid grid-cols-2 shrink-0 z-30">
+        <button type="button" id="mobileTabForm" onclick="switchMobilePane('form')" class="flex flex-col items-center justify-center gap-0.5 text-brand-600 font-semibold border-t-2 border-brand-600 bg-brand-50/30">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+            <span class="text-[11px]">กรอกข้อมูลสัญญา</span>
+        </button>
+        <button type="button" id="mobileTabPreview" onclick="switchMobilePane('preview')" class="flex flex-col items-center justify-center gap-0.5 text-slate-500 font-medium border-t-2 border-transparent">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span class="text-[11px]">ดูตัวอย่าง A4 & PDF</span>
+        </button>
+    </nav>
+
+    <!-- ==================== Fullscreen A4 Preview & Print Modal ==================== -->
+    <div id="previewModal" class="no-print fixed inset-0 z-50 hidden glass-backdrop flex flex-col">
+        <div class="h-14 bg-slate-950 text-white px-4 lg:px-6 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="file-check-2" class="w-5 h-5 text-emerald-400"></i>
                 <div>
-                    <h3 class="font-semibold text-sm sm:text-base">พรีวิวสัญญากู้ยืมเงิน (ขนาดกระดาษ A4 พร้อมลายน้ำทุกหน้า)</h3>
-                    <p class="text-xs text-slate-300">ตรวจสอบความถูกต้องก่อนกดปุ่ม "บันทึกเป็น PDF / พิมพ์เอกสาร"</p>
+                    <h3 class="font-semibold text-sm">พรีวิวสัญญากู้ยืมเงินฉบับสมบูรณ์ (ขนาด A4 มาตรฐาน 2 หน้า)</h3>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">ตรวจสอบลายน้ำชื่อผู้กู้และข้อความทางกฎหมายก่อนสั่งพิมพ์เป็นไฟล์ PDF</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2.5">
-                <button onclick="triggerPrintPDF()" class="bg-amber-500 hover:bg-amber-400 text-navy-900 font-bold px-4 py-2 rounded-xl text-sm shadow-lg flex items-center gap-2 transition">
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="triggerPrintPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-1.5 transition">
                     <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>บันทึกเป็น PDF / พิมพ์ (A4)</span>
+                    <span>บันทึกเป็น PDF / พิมพ์ A4</span>
                 </button>
-                <button onclick="closeFullPreview()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-sm border border-slate-600 transition">
+                <button type="button" onclick="closeFullPreview()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl text-xs border border-slate-700 transition">
                     ปิดหน้าต่าง
                 </button>
             </div>
         </div>
 
-        <div class="py-8 px-4 flex flex-col items-center">
-            <div id="modal-document-container"></div>
+        <div class="flex-1 overflow-y-auto py-6 px-4 flex flex-col items-center">
+            <div id="modal-document-container" class="origin-top scale-[0.44] sm:scale-[0.72] md:scale-[0.88] lg:scale-100"></div>
         </div>
     </div>
 
     <!-- พื้นที่สำหรับสั่งพิมพ์จริง (Hidden on Screen, Visible on @media print) -->
     <div id="print-area" class="hidden"></div>
 
-    <!-- Modal แสดงผลลัพธ์การส่งข้อมูลเข้าฐานข้อมูล / Google Form -->
-    <div id="syncResultModal" class="no-print fixed inset-0 z-50 hidden preview-modal-backdrop flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-fade-in">
-            <div class="flex items-center gap-3">
-                <div id="syncStatusIcon" class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                    <i data-lucide="check-circle-2" class="w-7 h-7"></i>
+    <!-- ==================== Modal ตั้งค่าเชื่อมต่อ Google Form / Google Sheets ==================== -->
+    <div id="cloudSettingsModal" class="no-print fixed inset-0 z-50 hidden glass-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="database" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">เชื่อมต่อฐานข้อมูล / Google Form</h3>
+                        <p class="text-xs text-slate-500">ส่งข้อมูลสัญญาอัตโนมัติเมื่อกดปุ่ม "บันทึก & ส่งข้อมูล"</p>
+                    </div>
                 </div>
+                <button type="button" onclick="closeCloudSettingsModal()" class="text-slate-400 hover:text-slate-700 p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
                 <div>
-                    <h3 id="syncResultTitle" class="text-lg font-bold text-navy-900">บันทึกข้อมูลสัญญาสำเร็จ!</h3>
-                    <p id="syncResultSubtitle" class="text-xs text-slate-500">ข้อมูลถูกจัดเก็บและส่งไปยังปลายทางเรียบร้อยแล้ว</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-2xl text-xs font-mono overflow-x-auto max-h-56">
-                <div class="text-slate-400 mb-1">// ข้อมูล JSON Payload ที่ส่งไปยังระบบฐานข้อมูล / Google Form:</div>
-                <pre id="syncPayloadOutput"></pre>
-            </div>
-
-            <div class="flex flex-wrap justify-end gap-2 pt-2">
-                <button onclick="copyPayload()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
-                    คัดลอก JSON
-                </button>
-                <button onclick="closeSyncModal(); openFullPreview();" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-navy-900 rounded-xl text-xs font-semibold transition">
-                    พรีวิว & ดาวน์โหลด PDF
-                </button>
-                <button onclick="closeSyncModal()" class="px-4 py-2 bg-navy-900 hover:bg-navy-800 text-white rounded-xl text-xs font-semibold transition">
-                    ตกลง
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal ประวัติการบันทึกข้อมูล (Local Database) -->
-    <div id="historyModal" class="no-print fixed inset-0 z-50 hidden preview-modal-backdrop flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[85vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="database" class="w-5 h-5 text-navy-900"></i>
-                    <h3 class="text-lg font-bold text-navy-900">ประวัติสัญญากู้ยืมเงินในฐานข้อมูล</h3>
-                </div>
-                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-700">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div id="historyListContainer" class="overflow-y-auto flex-1 space-y-2.5 pr-1">
-                <!-- รายการประวัติจะแสดงที่นี่ -->
-            </div>
-
-            <div class="border-t border-slate-100 pt-3 flex justify-between items-center">
-                <button onclick="clearAllHistory()" class="text-xs text-rose-600 hover:underline">ล้างประวัติทั้งหมด</button>
-                <button onclick="closeHistoryModal()" class="px-4 py-2 bg-navy-900 text-white rounded-xl text-xs font-semibold">ปิดหน้าต่าง</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal คู่มือเชื่อมต่อ Google Form / Google Sheets -->
-    <div id="guideModal" class="no-print fixed inset-0 z-50 hidden preview-modal-backdrop flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[85vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-lg font-bold text-navy-900 flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-5 h-5 text-amber-500"></i>
-                    คู่มือเชื่อมต่อ Google Form & Google Sheets
-                </h3>
-                <button onclick="closeGuideModal()" class="text-slate-400 hover:text-slate-700">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
-                <div class="bg-navy-50 p-3.5 rounded-2xl border border-navy-100">
-                    <h4 class="font-bold text-navy-900 mb-1">วิธีที่ 1: เชื่อมต่อกับ Google Form โดยตรง (ไม่ต้องเขียนโค้ด)</h4>
-                    <ol class="list-decimal list-inside space-y-1 text-xs">
-                        <li>สร้าง Google Form ที่มีคำถาม: ชื่อผู้กู้, เลขบัตรประชาชน, เบอร์โทร, จำนวนเงินกู้</li>
-                        <li>กดปุ่ม <b>จุด 3 จุดมุมขวาบน</b> เลือก <b>"รับลิงก์ที่กรอกข้อมูลไว้ล่วงหน้า" (Get pre-filled link)</b></li>
-                        <li>กรอกข้อมูลทดสอบแล้วกดรับลิงก์ นำลิงก์มาดูรหัส <code>entry.xxxxxxx</code> ของแต่ละช่อง</li>
-                        <li>นำ URL ของฟอร์มเปลี่ยนท้ายจาก <code>/viewform</code> เป็น <code>/formResponse</code> มาวางในช่องตั้งค่าข้อ 4</li>
-                    </ol>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Google Form Action URL หรือ Google Apps Script Web App URL
+                    </label>
+                    <input type="url" id="webhookUrl" placeholder="https://docs.google.com/forms/d/e/.../formResponse หรือ https://script.google.com/macros/s/..." class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:border-brand-600 outline-none font-mono">
+                    <p class="text-[11px] text-slate-500 mt-1">
+                        * หากเว้นว่างไว้ ระบบจะบันทึกข้อมูลลงฐานข้อมูลในเบราว์เซอร์ (LocalDB) และแสดง JSON Payload ให้ทันที
+                    </p>
                 </div>
 
-                <div class="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-100">
-                    <h4 class="font-bold text-emerald-900 mb-1">วิธีที่ 2: ส่งเข้า Google Sheets ผ่าน Google Apps Script (แนะนำ)</h4>
-                    <p class="text-xs mb-2">เปิด Google Sheets > เมนู <b>ส่วนขยาย (Extensions) > Apps Script</b> วางโค้ดนี้แล้วกด Deploy เป็น Web App (สิทธิ์ Everyone):</p>
-                    <pre class="bg-slate-900 text-slate-100 p-3 rounded-xl text-[11px] font-mono overflow-x-auto">function doPost(e) {
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
+                    <span class="text-xs font-semibold text-slate-800 block">จับคู่รหัสช่องกรอก Google Form (Entry IDs - กรณีใช้ Google Form)</span>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[11px] text-slate-500">Entry ชื่อผู้กู้</label>
+                            <input type="text" id="entryBorrowerName" placeholder="entry.1000001" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-500">Entry เลขบัตรผู้กู้</label>
+                            <input type="text" id="entryBorrowerId" placeholder="entry.1000002" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-500">Entry เบอร์โทร</label>
+                            <input type="text" id="entryBorrowerPhone" placeholder="entry.1000003" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-500">Entry จำนวนเงินกู้</label>
+                            <input type="text" id="entryLoanAmount" placeholder="entry.1000004" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <details class="text-xs bg-indigo-50/60 rounded-xl p-3 border border-indigo-100">
+                    <summary class="font-semibold text-indigo-900 cursor-pointer">ดูโค้ด Google Apps Script สำหรับส่งเข้า Google Sheets</summary>
+                    <pre class="mt-2 bg-slate-900 text-slate-100 p-2.5 rounded-lg text-[10px] font-mono overflow-x-auto">function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
   sheet.appendRow([
@@ -565,24 +680,84 @@
   return ContentService.createTextOutput(JSON.stringify({"status":"success"}))
     .setMimeType(ContentService.MimeType.JSON);
 }</pre>
+                </details>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="saveCloudSettings()" class="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-semibold transition">
+                    บันทึกการตั้งค่า
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Modal แสดงผลลัพธ์การบันทึกข้อมูล ==================== -->
+    <div id="syncResultModal" class="no-print fixed inset-0 z-50 hidden glass-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 id="syncResultTitle" class="text-base font-bold text-slate-900">บันทึกข้อมูลสัญญาสำเร็จ!</h3>
+                    <p id="syncResultSubtitle" class="text-xs text-slate-500">จัดเก็บข้อมูลและเตรียมเอกสารสัญญาเรียบร้อยแล้ว</p>
                 </div>
             </div>
 
-            <div class="flex justify-end pt-2">
-                <button onclick="closeGuideModal()" class="px-5 py-2 bg-navy-900 text-white rounded-xl text-xs font-semibold">เข้าใจแล้ว</button>
+            <div class="bg-slate-900 text-emerald-400 p-3.5 rounded-xl text-[11px] font-mono overflow-x-auto max-h-52">
+                <div class="text-slate-400 mb-1">// ข้อมูล JSON ที่บันทึกและส่งไปยังระบบฐานข้อมูล:</div>
+                <pre id="syncPayloadOutput"></pre>
+            </div>
+
+            <div class="flex flex-wrap justify-end gap-2 pt-1">
+                <button type="button" onclick="copyPayload()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+                    คัดลอก JSON
+                </button>
+                <button type="button" onclick="closeSyncModal(); openFullPreview();" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-semibold transition">
+                    เปิดพรีวิว & ดาวน์โหลด PDF
+                </button>
+                <button type="button" onclick="closeSyncModal()" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold transition">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Modal ประวัติสัญญากู้ยืมเงิน ==================== -->
+    <div id="historyModal" class="no-print fixed inset-0 z-50 hidden glass-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="folder-clock" class="w-5 h-5 text-brand-600"></i>
+                    <h3 class="text-base font-bold text-slate-900">ประวัติสัญญากู้ยืมเงินในฐานข้อมูล</h3>
+                </div>
+                <button type="button" onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="historyListContainer" class="overflow-y-auto flex-1 space-y-2.5 pr-1"></div>
+
+            <div class="border-t border-slate-100 pt-3 flex justify-between items-center">
+                <button type="button" onclick="clearAllHistory()" class="text-xs text-rose-600 hover:underline">ล้างประวัติทั้งหมด</button>
+                <button type="button" onclick="closeHistoryModal()" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="no-print fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-navy-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-amber-400/40 flex items-center gap-2.5 text-sm">
-        <i data-lucide="info" class="w-4 h-4 text-amber-400"></i>
-        <span id="toastMsg">ข้อความแจ้งเตือน</span>
+    <div id="toast" class="no-print fixed bottom-16 lg:bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2 text-xs font-medium">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toastMsg">แจ้งเตือน</span>
     </div>
 
     <script>
-        // เริ่มต้นใช้งาน Lucide Icons
         lucide.createIcons();
+
+        let currentStep = 1;
+        let currentZoom = 0.72;
+        const A4_WIDTH_PX = 794;   // 210mm @ 96dpi
+        const A4_HEIGHT_PX = 1123; // 297mm @ 96dpi
 
         // สร้างเลขที่สัญญาอัตโนมัติ
         function generateContractNumber() {
@@ -593,7 +768,7 @@
             return `LN-${year}${month}-${rand}`;
         }
 
-        // ตั้งค่าเริ่มต้นเมื่อโหลดหน้าเว็บ
+        // เริ่มต้นระบบเมื่อโหลดหน้าเว็บ
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             const nextYear = new Date();
@@ -604,42 +779,152 @@
             document.getElementById('contractDate').value = today;
             document.getElementById('dueDate').value = dueDefault;
 
-            // โหลด Webhook URL ที่เคยบันทึกไว้
+            // โหลดการตั้งค่า Cloud ที่บันทึกไว้
             const savedWebhook = localStorage.getItem('thai_loan_webhook_url');
             if (savedWebhook) {
                 document.getElementById('webhookUrl').value = savedWebhook;
             }
+            updateCloudStatusUI();
 
+            goToStep(1);
             updateHistoryCount();
             renderContract();
 
-            // ผูก Event Listener ทุก Input เพื่ออัปเดตสัญญาแบบ Real-time
+            // คำนวณ Auto-Fit Zoom ให้กระดาษ A4 พอดีหน้าจอทันที
+            setTimeout(autoFitZoom, 60);
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    document.getElementById('leftPane').classList.remove('hidden');
+                    document.getElementById('rightPane').classList.remove('hidden');
+                    document.getElementById('rightPane').classList.add('flex');
+                }
+                autoFitZoom();
+            });
+
+            // ผูก Event Listener ทุก Input
             const inputs = document.querySelectorAll('#loanForm input, #loanForm textarea, #loanForm select');
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
-                    if (input.id === 'webhookUrl') {
-                        localStorage.setItem('thai_loan_webhook_url', input.value.trim());
-                        updateSyncBadge();
-                    }
                     renderContract();
+                    updateCompletionProgress();
                 });
             });
-            updateSyncBadge();
+            updateCompletionProgress();
         });
 
-        function updateSyncBadge() {
-            const url = document.getElementById('webhookUrl').value.trim();
-            const badge = document.getElementById('syncModeBadge');
-            if (url) {
-                badge.textContent = 'เชื่อมต่อ URL จริง + LocalDB';
-                badge.className = 'text-[11px] bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full font-semibold';
+        // ==================== ระบบ Stepper Navigation ====================
+        function goToStep(step) {
+            currentStep = step;
+            for (let i = 1; i <= 4; i++) {
+                const panel = document.getElementById(`stepPanel-${i}`);
+                const btn = document.getElementById(`stepBtn-${i}`);
+
+                if (i === step) {
+                    panel.classList.remove('hidden');
+                    btn.className = 'step-pill flex flex-col items-center py-2 px-1 rounded-xl border-2 border-brand-600 bg-brand-50 text-brand-700 text-center transition shadow-xs';
+                } else if (i < step) {
+                    panel.classList.add('hidden');
+                    btn.className = 'step-pill flex flex-col items-center py-2 px-1 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-700 text-center transition';
+                } else {
+                    panel.classList.add('hidden');
+                    btn.className = 'step-pill flex flex-col items-center py-2 px-1 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 text-center transition';
+                }
+            }
+
+            // จัดการปุ่ม ย้อนกลับ / ถัดไป / บันทึก
+            document.getElementById('prevStepBtn').disabled = (step === 1);
+            if (step === 4) {
+                document.getElementById('nextStepBtn').classList.add('hidden');
+                document.getElementById('submitBtn').classList.remove('hidden');
             } else {
-                badge.textContent = 'โหมดจำลอง + LocalDB';
-                badge.className = 'text-[11px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-medium';
+                document.getElementById('nextStepBtn').classList.remove('hidden');
+                document.getElementById('submitBtn').classList.add('hidden');
             }
         }
 
-        // ฟังก์ชันแปลงตัวเลขเป็นคำอ่านภาษาไทย (บาทถ้วน / สตางค์)
+        function changeStep(delta) {
+            const target = currentStep + delta;
+            if (target >= 1 && target <= 4) {
+                goToStep(target);
+            }
+        }
+
+        // คำนวณ % ความคืบหน้าการกรอกข้อมูล
+        function updateCompletionProgress() {
+            const trackedIds = [
+                'lenderName', 'lenderIdCard', 'lenderAddress',
+                'borrowerName', 'borrowerIdCard', 'borrowerPhone', 'borrowerAddress',
+                'loanAmount', 'dueDate', 'witness1'
+            ];
+            let filled = 0;
+            trackedIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.value.trim() !== '') filled++;
+            });
+            const percent = Math.round((filled / trackedIds.length) * 100);
+            document.getElementById('completionBadge').textContent = `${percent}%`;
+            document.getElementById('completionBar').style.width = `${Math.max(10, percent)}%`;
+        }
+
+        // ปุ่มเลือกยอดเงินด่วน
+        function setQuickAmount(val) {
+            document.getElementById('loanAmount').value = val;
+            renderContract();
+            updateCompletionProgress();
+        }
+
+        // ==================== ระบบ Auto-Scale Zoom กระดาษ A4 ให้พอดีหน้าจอ ====================
+        function applyZoom(scale) {
+            currentZoom = Math.min(1.15, Math.max(0.38, scale));
+            const wrapper = document.getElementById('live-preview-wrapper');
+            const stage = document.getElementById('zoomStage');
+
+            wrapper.style.transform = `scale(${currentZoom})`;
+            // ปรับขนาดกล่อง Stage ให้พอดีกับพื้นที่ที่ Scale แล้ว เพื่อไม่ให้เกิด Scrollbar เกินจำเป็น
+            stage.style.width = `${A4_WIDTH_PX * currentZoom}px`;
+            stage.style.height = `${(A4_HEIGHT_PX * 2 + 24) * currentZoom}px`;
+
+            document.getElementById('zoomLevelText').textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+
+        function adjustZoom(delta) {
+            applyZoom(currentZoom + delta);
+        }
+
+        function autoFitZoom() {
+            const container = document.getElementById('previewScrollContainer');
+            if (!container || container.clientWidth === 0) return;
+            const availableWidth = container.clientWidth - 48; // เว้นขอบซ้ายขวา 24px
+            const idealScale = availableWidth / A4_WIDTH_PX;
+            applyZoom(Math.min(0.95, idealScale));
+        }
+
+        // สลับแท็บบนมือถือ/แท็บเล็ต
+        function switchMobilePane(mode) {
+            const leftPane = document.getElementById('leftPane');
+            const rightPane = document.getElementById('rightPane');
+            const tabForm = document.getElementById('mobileTabForm');
+            const tabPreview = document.getElementById('mobileTabPreview');
+
+            if (mode === 'form') {
+                leftPane.classList.remove('hidden');
+                rightPane.classList.add('hidden');
+                rightPane.classList.remove('flex');
+
+                tabForm.className = 'flex flex-col items-center justify-center gap-0.5 text-brand-600 font-semibold border-t-2 border-brand-600 bg-brand-50/30';
+                tabPreview.className = 'flex flex-col items-center justify-center gap-0.5 text-slate-500 font-medium border-t-2 border-transparent';
+            } else {
+                leftPane.classList.add('hidden');
+                rightPane.classList.remove('hidden');
+                rightPane.classList.add('flex');
+
+                tabPreview.className = 'flex flex-col items-center justify-center gap-0.5 text-brand-600 font-semibold border-t-2 border-brand-600 bg-brand-50/30';
+                tabForm.className = 'flex flex-col items-center justify-center gap-0.5 text-slate-500 font-medium border-t-2 border-transparent';
+                setTimeout(autoFitZoom, 30);
+            }
+        }
+
+        // ==================== ฟังก์ชันแปลงตัวเลขเป็นคำอ่านภาษาไทย ====================
         function numberToThaiText(num) {
             if (!num || isNaN(num) || Number(num) <= 0) return 'ศูนย์บาทถ้วน';
             const number = parseFloat(num).toFixed(2);
@@ -673,7 +958,6 @@
             if (parseInt(integerPart) === 0) {
                 bahtText = 'ศูนย์บาท';
             } else {
-                // รองรับตัวเลขหลักล้านขึ้นไป
                 let temp = integerPart;
                 let chunks = [];
                 while (temp.length > 0) {
@@ -693,7 +977,6 @@
             }
         }
 
-        // แปลงวันที่ YYYY-MM-DD เป็นรูปแบบภาษาไทย (เช่น 12 พฤศจิกายน พ.ศ. 2569)
         function formatThaiDate(dateStr) {
             if (!dateStr) return '................................................';
             const months = [
@@ -702,13 +985,10 @@
             ];
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return '................................................';
-            const day = d.getDate();
-            const month = months[d.getMonth()];
-            const year = d.getFullYear() + 543;
-            return `${day} ${month} พ.ศ. ${year}`;
+            return `${d.getDate()} ${months[d.getMonth()]} พ.ศ. ${d.getFullYear() + 543}`;
         }
 
-        // สร้าง HTML สำหรับชั้นลายน้ำ (Watermark)
+        // สร้างลายน้ำชื่อผู้กู้ทุกหน้ากระดาษ
         function createWatermarkHTML(borrowerName) {
             const displayName = borrowerName && borrowerName.trim() !== ''
                 ? `สำเนาสัญญาเงินกู้ • ผู้กู้: ${borrowerName.trim()}`
@@ -722,14 +1002,20 @@
             return `<div class="watermark-layer">${rows}</div>`;
         }
 
-        // ฟังก์ชันดึงค่าจากฟอร์มทั้งหมด
         function getFormData() {
-            const amountVal = document.getElementById('loanAmount').value;
-            const formattedAmount = amountVal ? Number(amountVal).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+            const amountVal = parseFloat(document.getElementById('loanAmount').value) || 0;
+            const rateVal = parseFloat(document.getElementById('interestRate').value) || 0;
+            const formattedAmount = amountVal > 0
+                ? amountVal.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                : '';
             const thaiText = numberToThaiText(amountVal);
 
-            // อัปเดตช่องแสดงตัวอักษรใต้ฟอร์ม
-            document.getElementById('thaiBahtPreview').textContent = amountVal ? `(${thaiText})` : '-';
+            // อัปเดตกล่องแสดงคำอ่านและการคำนวณเบื้องต้น
+            document.getElementById('thaiBahtPreview').textContent = amountVal > 0 ? `(${thaiText})` : 'ศูนย์บาทถ้วน';
+            const yearlyInterest = (amountVal * (rateVal / 100)).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const stampDuty = amountVal > 0 ? Math.min(10000, Math.ceil(amountVal / 2000)) : 0;
+            document.getElementById('estYearlyInterest').textContent = `${yearlyInterest} บาท / ปี`;
+            document.getElementById('estStampDuty').textContent = `${stampDuty.toLocaleString('th-TH')} บาท`;
 
             return {
                 contractNumber: document.getElementById('contractNumber').value || generateContractNumber(),
@@ -746,7 +1032,7 @@
                 borrowerAge: document.getElementById('borrowerAge').value.trim(),
                 borrowerJob: document.getElementById('borrowerJob').value.trim(),
                 borrowerAddress: document.getElementById('borrowerAddress').value.trim(),
-                loanAmount: amountVal,
+                loanAmount: amountVal > 0 ? String(amountVal) : '',
                 loanAmountFormatted: formattedAmount,
                 loanAmountThai: thaiText,
                 interestRate: document.getElementById('interestRate').value || '0',
@@ -760,7 +1046,6 @@
             };
         }
 
-        // สร้างโครงสร้างเอกสาร A4 2 หน้า พร้อมลายน้ำทุกหน้า
         function generateContractPagesHTML(data) {
             const val = (v, placeholder = '..................................................') =>
                 v ? `<span class="dotted-fill">${v}</span>` : `<span class="dotted-fill text-slate-400 font-normal">${placeholder}</span>`;
@@ -832,7 +1117,7 @@
                             </p>
                         </div>
 
-                        <div class="absolute bottom-6 left-0 right-0 text-center text-xs text-slate-400">
+                        <div class="absolute bottom-2 left-0 right-0 text-center text-xs text-slate-400">
                             - หน้า 1 / 2 • เอกสารสัญญากู้ยืมเงินเลขที่ ${data.contractNumber} -
                         </div>
                     </div>
@@ -861,30 +1146,27 @@
                             </p>
                         </div>
 
-                        <!-- ส่วนลงนามคู่สัญญาและพยาน 2 คน -->
-                        <div class="mt-12 space-y-12">
-                            <!-- ผู้ให้กู้ & ผู้กู้ -->
+                        <div class="mt-10 space-y-10">
                             <div class="grid grid-cols-2 gap-8 text-center">
-                                <div class="space-y-2">
+                                <div class="space-y-1.5">
                                     <p>ลงชื่อ .................................................... ผู้ให้กู้</p>
                                     <p>( ${val(data.lenderName, '................................................')} )</p>
                                     <p class="text-xs text-slate-500">วันที่ ${data.contractDateThai}</p>
                                 </div>
-                                <div class="space-y-2">
+                                <div class="space-y-1.5">
                                     <p>ลงชื่อ .................................................... ผู้กู้</p>
                                     <p>( ${val(data.borrowerName, '................................................')} )</p>
                                     <p class="text-xs text-slate-500">วันที่ ${data.contractDateThai}</p>
                                 </div>
                             </div>
 
-                            <!-- พยานคนที่ 1 & พยานคนที่ 2 -->
-                            <div class="grid grid-cols-2 gap-8 text-center pt-4">
-                                <div class="space-y-2">
+                            <div class="grid grid-cols-2 gap-8 text-center pt-2">
+                                <div class="space-y-1.5">
                                     <p>ลงชื่อ .................................................... พยาน</p>
                                     <p>( ${val(data.witness1, '................................................')} )</p>
                                     <p class="text-xs text-slate-500">พยานคนที่ 1</p>
                                 </div>
-                                <div class="space-y-2">
+                                <div class="space-y-1.5">
                                     <p>ลงชื่อ .................................................... พยาน</p>
                                     <p>( ${val(data.witness2, '................................................')} )</p>
                                     <p class="text-xs text-slate-500">พยานคนที่ 2</p>
@@ -892,8 +1174,7 @@
                             </div>
                         </div>
 
-                        <!-- หมายเหตุท้ายสัญญา -->
-                        <div class="mt-14 p-3.5 border border-slate-300 rounded-lg bg-slate-50/70 text-xs text-slate-600">
+                        <div class="mt-12 p-3.5 border border-slate-300 rounded-lg bg-slate-50/70 text-xs text-slate-600">
                             <p class="font-bold text-slate-800 mb-1">คำแนะนำทางกฎหมาย:</p>
                             <ul class="list-disc list-inside space-y-0.5">
                                 <li>การกู้ยืมเงินเกินกว่า 2,000 บาทขึ้นไป ต้องมีหลักฐานเป็นหนังสือลงลายมือชื่อผู้กู้จึงจะฟ้องร้องบังคับคดีได้</li>
@@ -902,7 +1183,7 @@
                             </ul>
                         </div>
 
-                        <div class="absolute bottom-6 left-0 right-0 text-center text-xs text-slate-400">
+                        <div class="absolute bottom-2 left-0 right-0 text-center text-xs text-slate-400">
                             - หน้า 2 / 2 • เอกสารสัญญากู้ยืมเงินเลขที่ ${data.contractNumber} • ลายน้ำผู้กู้: ${data.borrowerName || '-'} -
                         </div>
                     </div>
@@ -910,7 +1191,6 @@
             `;
         }
 
-        // Render สัญญาลงใน Live Preview, Modal และ Print Area
         function renderContract() {
             const data = getFormData();
             const html = generateContractPagesHTML(data);
@@ -920,47 +1200,69 @@
             document.getElementById('print-area').innerHTML = html;
         }
 
-        // เปิดหน้าต่างพรีวิวเต็มจอ
+        // ==================== Modals & Actions ====================
         function openFullPreview() {
             renderContract();
             document.getElementById('previewModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
         }
 
         function closeFullPreview() {
             document.getElementById('previewModal').classList.add('hidden');
-            document.body.style.overflow = '';
         }
 
-        // สั่งพิมพ์ / บันทึกเป็นไฟล์ PDF ขนาด A4
         function triggerPrintPDF() {
             renderContract();
             window.print();
         }
 
-        // บันทึกข้อมูลและส่งไปยัง Google Form / ฐานข้อมูล
+        function openCloudSettingsModal() {
+            document.getElementById('cloudSettingsModal').classList.remove('hidden');
+        }
+
+        function closeCloudSettingsModal() {
+            document.getElementById('cloudSettingsModal').classList.add('hidden');
+        }
+
+        function saveCloudSettings() {
+            const url = document.getElementById('webhookUrl').value.trim();
+            localStorage.setItem('thai_loan_webhook_url', url);
+            updateCloudStatusUI();
+            closeCloudSettingsModal();
+            showToast('บันทึกการตั้งค่าการเชื่อมต่อเรียบร้อยแล้ว');
+        }
+
+        function updateCloudStatusUI() {
+            const url = document.getElementById('webhookUrl').value.trim();
+            const dot = document.getElementById('cloudStatusDot');
+            const summary = document.getElementById('cloudDestinationSummary');
+
+            if (url) {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                summary.textContent = `เชื่อมต่อปลายทาง: ${url.slice(0, 48)}...`;
+            } else {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+                summary.textContent = 'บันทึกลงฐานข้อมูลในระบบ (LocalDB) + พร้อมส่ง JSON Webhook';
+            }
+        }
+
         async function handleSaveAndSync(event) {
             event.preventDefault();
             const data = getFormData();
             const webhookUrl = document.getElementById('webhookUrl').value.trim();
             const submitBtn = document.getElementById('submitBtn');
 
-            // แสดงสถานะกำลังโหลด
-            const originalBtnHTML = submitBtn.innerHTML;
+            const originalHTML = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span> <span>กำลังบันทึกและส่งข้อมูล...</span>`;
+            submitBtn.innerHTML = `<span class="animate-spin inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full"></span> <span>กำลังบันทึก...</span>`;
 
-            // 1. บันทึกลง LocalStorage (ฐานข้อมูลในเครื่อง)
             saveToLocalHistory(data);
 
-            let syncStatusTitle = 'บันทึกข้อมูลลงฐานข้อมูลสำเร็จ!';
-            let syncStatusSubtitle = 'จัดเก็บข้อมูลลงระบบเรียบร้อยแล้ว (โหมดทดสอบ & LocalStorage)';
+            let syncStatusTitle = 'บันทึกข้อมูลสัญญาสำเร็จ!';
+            let syncStatusSubtitle = 'จัดเก็บข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว (LocalDB)';
 
-            // 2. หากมีการระบุ URL จริง (Google Form หรือ Google Apps Script / Webhook)
             if (webhookUrl) {
                 try {
                     if (webhookUrl.includes('docs.google.com/forms')) {
-                        // ส่งเข้า Google Form ผ่าน FormData (mode: no-cors)
                         const formData = new FormData();
                         const eName = document.getElementById('entryBorrowerName').value.trim();
                         const eId = document.getElementById('entryBorrowerId').value.trim();
@@ -972,15 +1274,10 @@
                         if (ePhone) formData.append(ePhone, data.borrowerPhone);
                         if (eAmount) formData.append(eAmount, data.loanAmount);
 
-                        await fetch(webhookUrl, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            body: formData
-                        });
+                        await fetch(webhookUrl, { method: 'POST', mode: 'no-cors', body: formData });
                         syncStatusTitle = 'ส่งข้อมูลเข้า Google Form สำเร็จ!';
-                        syncStatusSubtitle = 'ระบบได้ส่งข้อมูลไปยัง Google Form เรียบร้อยแล้ว';
+                        syncStatusSubtitle = 'ส่งข้อมูลไปยัง Google Form และฐานข้อมูลในเครื่องแล้ว';
                     } else {
-                        // ส่งเข้า Google Apps Script Web App หรือ Webhook API ทั่วไป
                         await fetch(webhookUrl, {
                             method: 'POST',
                             mode: 'no-cors',
@@ -988,21 +1285,18 @@
                             body: JSON.stringify(data)
                         });
                         syncStatusTitle = 'ส่งข้อมูลเข้าฐานข้อมูลสำเร็จ!';
-                        syncStatusSubtitle = 'ส่งข้อมูล JSON ไปยังปลายทาง Web App / Webhook เรียบร้อยแล้ว';
+                        syncStatusSubtitle = 'ส่งข้อมูล JSON ไปยัง Web App / Google Sheets เรียบร้อยแล้ว';
                     }
-                } catch (error) {
-                    console.error('Sync Error:', error);
+                } catch (err) {
+                    console.error(err);
                     syncStatusTitle = 'บันทึกในเครื่องสำเร็จ (การส่งภายนอกมีข้อจำกัด)';
-                    syncStatusSubtitle = 'กรุณาตรวจสอบ URL หรือสิทธิ์การเข้าถึง CORS ของเซิร์ฟเวอร์ปลายทาง';
                 }
             }
 
-            // คืนค่าปุ่ม
             submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnHTML;
+            submitBtn.innerHTML = originalHTML;
             lucide.createIcons();
 
-            // แสดง Modal ผลลัพธ์
             document.getElementById('syncResultTitle').textContent = syncStatusTitle;
             document.getElementById('syncResultSubtitle').textContent = syncStatusSubtitle;
             document.getElementById('syncPayloadOutput').textContent = JSON.stringify(data, null, 2);
@@ -1013,7 +1307,6 @@
             document.getElementById('syncResultModal').classList.add('hidden');
         }
 
-        // คัดลอก JSON Payload
         function copyPayload() {
             const text = document.getElementById('syncPayloadOutput').textContent;
             const textarea = document.createElement('textarea');
@@ -1022,13 +1315,11 @@
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            showToast('คัดลอกข้อมูล JSON Payload เรียบร้อยแล้ว');
+            showToast('คัดลอกข้อมูล JSON เรียบร้อยแล้ว');
         }
 
-        // จัดการฐานข้อมูล LocalStorage
         function saveToLocalHistory(data) {
             const existing = JSON.parse(localStorage.getItem('thai_loan_records') || '[]');
-            // อัปเดตถ้าเลขสัญญาซ้ำ หรือเพิ่มใหม่
             const index = existing.findIndex(item => item.contractNumber === data.contractNumber);
             if (index > -1) {
                 existing[index] = data;
@@ -1049,25 +1340,21 @@
             const container = document.getElementById('historyListContainer');
 
             if (existing.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-10 text-slate-400">
-                        <p class="text-sm">ยังไม่มีประวัติสัญญากู้ยืมเงินที่บันทึกไว้</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">ยังไม่มีประวัติสัญญากู้ยืมเงินที่บันทึกไว้</div>`;
             } else {
                 container.innerHTML = existing.map((item, idx) => `
-                    <div class="p-3.5 rounded-2xl border border-slate-200 hover:border-navy-700 bg-slate-50 flex flex-wrap items-center justify-between gap-3 transition">
+                    <div class="p-3.5 rounded-xl border border-slate-200 hover:border-brand-500 bg-slate-50 flex flex-wrap items-center justify-between gap-3 transition">
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-mono font-bold bg-navy-900 text-amber-400 px-2 py-0.5 rounded">${item.contractNumber}</span>
-                                <span class="font-semibold text-sm text-navy-900">ผู้กู้: ${item.borrowerName || '-'}</span>
+                                <span class="text-[11px] font-mono font-bold bg-slate-900 text-amber-400 px-2 py-0.5 rounded">${item.contractNumber}</span>
+                                <span class="font-semibold text-xs text-slate-900">ผู้กู้: ${item.borrowerName || '-'}</span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1">
+                            <p class="text-[11px] text-slate-500 mt-1">
                                 ยอดกู้: <b class="text-slate-800">${item.loanAmountFormatted || '0.00'} บาท</b> • ดอกเบี้ย ${item.interestRate}% • ครบกำหนด ${item.dueDateThai}
                             </p>
                         </div>
-                        <button onclick="loadHistoryItem(${idx})" class="px-3 py-1.5 bg-white hover:bg-navy-900 hover:text-white text-navy-900 border border-navy-900 rounded-xl text-xs font-semibold transition">
-                            โหลดข้อมูลนี้
+                        <button type="button" onclick="loadHistoryItem(${idx})" class="px-3 py-1.5 bg-white hover:bg-brand-600 hover:text-white text-brand-600 border border-brand-600 rounded-lg text-xs font-semibold transition">
+                            โหลดแก้ไข
                         </button>
                     </div>
                 `).join('');
@@ -1106,6 +1393,7 @@
             document.getElementById('witness2').value = item.witness2 || '';
 
             renderContract();
+            updateCompletionProgress();
             closeHistoryModal();
             showToast(`โหลดข้อมูลสัญญา ${item.contractNumber} เรียบร้อยแล้ว`);
         }
@@ -1117,15 +1405,6 @@
             showToast('ล้างประวัติทั้งหมดเรียบร้อยแล้ว');
         }
 
-        // เปิด/ปิด คู่มือ
-        function openGuideModal() {
-            document.getElementById('guideModal').classList.remove('hidden');
-        }
-        function closeGuideModal() {
-            document.getElementById('guideModal').classList.add('hidden');
-        }
-
-        // กรอกข้อมูลตัวอย่างเพื่อทดสอบระบบทันที
         function fillSampleData() {
             document.getElementById('lenderName').value = 'นายธนากร มั่งคั่ง';
             document.getElementById('lenderIdCard').value = '1-1004-00589-12-3';
@@ -1147,28 +1426,29 @@
             document.getElementById('witness2').value = 'นายวิชัย ซื่อตรง';
 
             renderContract();
+            updateCompletionProgress();
             showToast('ใส่ข้อมูลตัวอย่างเรียบร้อยแล้ว ดูลายน้ำชื่อผู้กู้บนกระดาษ A4 ได้ทันที');
         }
 
-        // ล้างฟอร์ม
         function resetForm() {
             document.getElementById('loanForm').reset();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('contractNumber').value = generateContractNumber();
             document.getElementById('contractDate').value = today;
             document.getElementById('interestRate').value = '15';
+            goToStep(1);
             renderContract();
+            updateCompletionProgress();
             showToast('ล้างข้อมูลฟอร์มเรียบร้อยแล้ว');
         }
 
-        // แสดง Toast แจ้งเตือนมุมขวาล่าง
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').textContent = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.remove('translate-y-24', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3200);
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
         }
     </script>
 </body>
