@@ -204,9 +204,46 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #64748b;
     }
+
+    /* พื้นที่เซ็นลายเซ็นอิเล็กทรอนิกส์ */
+    .sig-canvas {
+      touch-action: none;
+      cursor: crosshair;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 14px 14px;
+    }
+
+    /* กล่องแสดงรูปลายเซ็นบนเอกสารสัญญา A4 */
+    .doc-sig-box {
+      height: 54px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: -10px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .doc-sig-img {
+      max-height: 52px;
+      max-width: 170px;
+      object-fit: contain;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
+
+  <!-- Overlay โหลดขณะสร้าง PDF ป้องกันหน้าขาวและแจ้งสถานะให้ผู้ใช้ทราบ -->
+  <div id="pdf-loading-overlay" class="no-print fixed inset-0 z-[100] bg-navy-900/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl border border-slate-200">
+      <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-file-pdf text-2xl fa-bounce"></i>
+      </div>
+      <h4 class="font-bold text-navy-900 text-base">กำลังสร้างไฟล์ PDF (A4)...</h4>
+      <p class="text-xs text-slate-500 mt-1">ระบบกำลังจัดหน้ากระดาษ ฝังลายน้ำชื่อผู้กู้ และลายเซ็นอิเล็กทรอนิกส์ กรุณารอสักครู่</p>
+    </div>
+  </div>
 
   <!-- แถบแจ้งเตือน Toast (แทน alert) -->
   <div id="toast-container" class="no-print fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
@@ -406,6 +443,131 @@
             </div>
           </div>
 
+          <!-- หมวดที่ 6: ระบบลงนามอิเล็กทรอนิกส์ (E-Signature Pad) -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <div class="flex items-center gap-2 text-navy-900 font-semibold text-sm">
+                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">6</span>
+                <span>ลงลายมือชื่ออิเล็กทรอนิกส์ (E-Signature)</span>
+              </div>
+              <span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-medium">
+                <i class="fa-solid fa-signature mr-1"></i>ติดใน PDF ทันที
+              </span>
+            </div>
+            <p class="text-xs text-slate-500">ใช้นิ้วมือ เมาส์ วาดลายเซ็นลงในช่องด้านล่าง หรือกดปุ่ม <strong>ขยายเซ็นเต็มจอ</strong> เพื่อความถนัดมือ</p>
+
+            <!-- แท็บเลือกผู้ลงนาม -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-200/70 p-1 rounded-xl">
+              <button type="button" onclick="selectSignerTab('lender')" id="sig-tab-lender" class="sig-role-btn py-1.5 px-2 rounded-lg text-xs font-semibold bg-navy-900 text-white shadow transition">
+                1. ผู้ให้กู้ <span id="sig-dot-lender" class="hidden inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1"></span>
+              </button>
+              <button type="button" onclick="selectSignerTab('borrower')" id="sig-tab-borrower" class="sig-role-btn py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-white/60 transition">
+                2. ผู้กู้ <span id="sig-dot-borrower" class="hidden inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1"></span>
+              </button>
+              <button type="button" onclick="selectSignerTab('witness1')" id="sig-tab-witness1" class="sig-role-btn py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-white/60 transition">
+                3. พยาน 1 <span id="sig-dot-witness1" class="hidden inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1"></span>
+              </button>
+              <button type="button" onclick="selectSignerTab('witness2')" id="sig-tab-witness2" class="sig-role-btn py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-white/60 transition">
+                4. พยาน 2 <span id="sig-dot-witness2" class="hidden inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1"></span>
+              </button>
+            </div>
+
+            <!-- กล่องวาดลายเซ็นสำหรับแต่ละบทบาท -->
+            <div id="sig-pads-wrapper" class="space-y-2">
+              <!-- Pad: ผู้ให้กู้ -->
+              <div id="sig-panel-lender" class="sig-panel space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-navy-900">ช่องลงนาม: <span class="text-blue-700">ผู้ให้กู้ (เจ้าหนี้)</span></span>
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="openFullscreenSign('lender')" class="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition">
+                      <i class="fa-solid fa-expand mr-1"></i>เซ็นเต็มจอ
+                    </button>
+                    <label class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium cursor-pointer transition" title="อัปโหลดรูปลายเซ็น">
+                      <i class="fa-solid fa-upload mr-1"></i>อัปโหลด
+                      <input type="file" accept="image/*" class="hidden" onchange="uploadSignatureImage(event, 'lender')" />
+                    </label>
+                    <button type="button" onclick="clearSignature('lender')" class="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-medium transition">
+                      <i class="fa-solid fa-eraser mr-1"></i>ล้าง
+                    </button>
+                  </div>
+                </div>
+                <div class="relative bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden h-36">
+                  <canvas id="canvas-lender" class="sig-canvas w-full h-full block"></canvas>
+                  <div class="pointer-events-none absolute bottom-2 left-4 right-4 border-b border-slate-300 text-[10px] text-slate-400 text-right">เซ็นชื่อผู้ให้กู้เหนือเส้นนี้</div>
+                </div>
+              </div>
+
+              <!-- Pad: ผู้กู้ -->
+              <div id="sig-panel-borrower" class="sig-panel hidden space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-navy-900">ช่องลงนาม: <span class="text-blue-700">ผู้กู้ (ลูกหนี้)</span></span>
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="openFullscreenSign('borrower')" class="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition">
+                      <i class="fa-solid fa-expand mr-1"></i>เซ็นเต็มจอ
+                    </button>
+                    <label class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium cursor-pointer transition">
+                      <i class="fa-solid fa-upload mr-1"></i>อัปโหลด
+                      <input type="file" accept="image/*" class="hidden" onchange="uploadSignatureImage(event, 'borrower')" />
+                    </label>
+                    <button type="button" onclick="clearSignature('borrower')" class="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-medium transition">
+                      <i class="fa-solid fa-eraser mr-1"></i>ล้าง
+                    </button>
+                  </div>
+                </div>
+                <div class="relative bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden h-36">
+                  <canvas id="canvas-borrower" class="sig-canvas w-full h-full block"></canvas>
+                  <div class="pointer-events-none absolute bottom-2 left-4 right-4 border-b border-slate-300 text-[10px] text-slate-400 text-right">เซ็นชื่อผู้กู้เหนือเส้นนี้</div>
+                </div>
+              </div>
+
+              <!-- Pad: พยาน 1 -->
+              <div id="sig-panel-witness1" class="sig-panel hidden space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-navy-900">ช่องลงนาม: <span class="text-blue-700">พยานคนที่ 1</span></span>
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="openFullscreenSign('witness1')" class="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition">
+                      <i class="fa-solid fa-expand mr-1"></i>เซ็นเต็มจอ
+                    </button>
+                    <label class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium cursor-pointer transition">
+                      <i class="fa-solid fa-upload mr-1"></i>อัปโหลด
+                      <input type="file" accept="image/*" class="hidden" onchange="uploadSignatureImage(event, 'witness1')" />
+                    </label>
+                    <button type="button" onclick="clearSignature('witness1')" class="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-medium transition">
+                      <i class="fa-solid fa-eraser mr-1"></i>ล้าง
+                    </button>
+                  </div>
+                </div>
+                <div class="relative bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden h-36">
+                  <canvas id="canvas-witness1" class="sig-canvas w-full h-full block"></canvas>
+                  <div class="pointer-events-none absolute bottom-2 left-4 right-4 border-b border-slate-300 text-[10px] text-slate-400 text-right">เซ็นชื่อพยานคนที่ 1 เหนือเส้นนี้</div>
+                </div>
+              </div>
+
+              <!-- Pad: พยาน 2 -->
+              <div id="sig-panel-witness2" class="sig-panel hidden space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-semibold text-navy-900">ช่องลงนาม: <span class="text-blue-700">พยานคนที่ 2</span></span>
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="openFullscreenSign('witness2')" class="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition">
+                      <i class="fa-solid fa-expand mr-1"></i>เซ็นเต็มจอ
+                    </button>
+                    <label class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium cursor-pointer transition">
+                      <i class="fa-solid fa-upload mr-1"></i>อัปโหลด
+                      <input type="file" accept="image/*" class="hidden" onchange="uploadSignatureImage(event, 'witness2')" />
+                    </label>
+                    <button type="button" onclick="clearSignature('witness2')" class="px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-medium transition">
+                      <i class="fa-solid fa-eraser mr-1"></i>ล้าง
+                    </button>
+                  </div>
+                </div>
+                <div class="relative bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden h-36">
+                  <canvas id="canvas-witness2" class="sig-canvas w-full h-full block"></canvas>
+                  <div class="pointer-events-none absolute bottom-2 left-4 right-4 border-b border-slate-300 text-[10px] text-slate-400 text-right">เซ็นชื่อพยานคนที่ 2 เหนือเส้นนี้</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- ปุ่มดำเนินการด้านล่างฟอร์ม -->
           <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3">
             <button type="submit" id="btn-submit-form" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 text-sm">
@@ -524,75 +686,39 @@
                 <!-- ข้อ 2 -->
                 <p class="indent-10 mb-3">
                   <strong>ข้อ ๒. อัตราดอกเบี้ย</strong> ในระหว่างที่ผู้กู้ยังมิได้ชำระต้นเงินคืนให้แก่ผู้ให้กู้ ผู้กู้ตกลงยินยอมเสียดอกเบี้ยให้แก่ผู้ให้กู้ในอัตราร้อยละ
-                  <span id="doc-interestRate" class="contract-fill min-w-[45px] text-center">15</span> ต่อปี
-                  นับแต่วันทำสัญญานี้เป็นต้นไป จนกว่าผู้กู้จะชำระต้นเงินและดอกเบี้ยคืนให้แก่ผู้ให้กู้จนครบถ้วน ทั้งนี้ อัตราดอกเบี้ยดังกล่าวเป็นไปตามที่กฎหมายกำหนด
-                </p>
-
-                <!-- ข้อ 3 -->
-                <p class="indent-10 mb-3">
-                  <strong>ข้อ ๓. กำหนดเวลาชำระคืน</strong> ผู้กู้ตกลงจะนำต้นเงินพร้อมดอกเบี้ยทั้งหมดมาชำระคืนให้แก่ผู้ให้กู้จนครบถ้วนภายในวันที่
-                  <span id="doc-dueDate" class="contract-fill min-w-[180px] text-center">....................................................</span>
-                  ณ ภูมิลำเนาของผู้ให้กู้ หรือโอนเข้าบัญชีธนาคารตามที่ผู้ให้กู้กำหนด
-                </p>
-
-                <!-- ข้อ 4 -->
-                <p class="indent-10 mb-3">
-                  <strong>ข้อ ๔. การผิดนัดชำระหนี้</strong> หากผู้กู้ผิดนัดไม่ชำระเงินต้นหรือดอกเบี้ยตามกำหนดเวลาในข้อ ๓ หรือผิดสัญญาข้อหนึ่งข้อใด ผู้กู้ยินยอมให้ผู้ให้กู้เรียกคืนเงินต้นพร้อมดอกเบี้ยค้างชำระทั้งหมดได้ทันที และผู้กู้ยินยอมชดใช้ค่าเสียหาย ค่าทวงถาม และค่าใช้จ่ายในการดำเนินคดีตามกฎหมายจนกว่าจะชำระหนี้เสร็จสิ้น
-                </p>
-              </div>
-            </div>
-
-            <!-- ================= กระดาษ A4 แผ่นที่ 2 ================= -->
-            <div class="a4-page" id="a4-page-2">
-              <!-- ชั้นลายน้ำ (Watermark) ชื่อผู้กู้ ปรากฏซ้ำทุกแผ่น -->
-              <div class="watermark-layer" aria-hidden="true">
-                <div class="watermark-text wm-dynamic-text">สำเนาสัญญา - ผู้กู้: ....................................</div>
-                <div class="watermark-text wm-dynamic-text">สำเนาสัญญา - ผู้กู้: ....................................</div>
-                <div class="watermark-text wm-dynamic-text">สำเนาสัญญา - ผู้กู้: ....................................</div>
-                <div class="watermark-text wm-dynamic-text">สำเนาสัญญา - ผู้กู้: ....................................</div>
-              </div>
-
-              <!-- เนื้อหาสัญญาหน้าที่ 2 -->
-              <div class="page-content text-[15px] text-justify flex flex-col justify-between min-h-[255mm]">
-                <div>
-                  <!-- ส่วนหัวหน้าที่ 2 -->
-                  <div class="flex justify-between items-start mb-6 text-xs text-slate-600 border-b border-slate-200 pb-2">
-                    <div>เลขที่สัญญา: <span id="doc-contractNumber-p2" class="font-bold text-black">LN-2026-001</span> (ต่อ)</div>
-                    <div>หน้า 2 / 2</div>
-                  </div>
-
-                  <!-- ข้อ 5 -->
-                  <p class="indent-10 mb-4">
-                    <strong>ข้อ ๕. การเปลี่ยนแปลงแก้ไขและหลักฐานการชำระเงิน</strong> การชำระเงินต้นหรือดอกเบี้ยตามสัญญานี้ ผู้กู้จะต้องขอรับหลักฐานเป็นหนังสือลงลายมือชื่อผู้ให้กู้ หรือหลักฐานการโอนเงินผ่านระบบธนาคารไว้เป็นสำคัญ มิฉะนั้นจะยกขึ้นอ้างว่าได้ชำระแล้วมิได้ และการแก้ไขเปลี่ยนแปลงข้อความในสัญญานี้จะกระทำได้ต่อเมื่อได้รับความยินยอมเป็นลายลักษณ์อักษรจากคู่สัญญาทั้งสองฝ่าย
-                  </p>
-
-                  <!-- ข้อ 6 -->
-                  <p class="indent-10 mb-8">
-                    <strong>ข้อ ๖. การทำคู่ฉบับ</strong> สัญญากู้ยืมเงินฉบับนี้ทำขึ้นเป็นสองฉบับ มีข้อความถูกต้องตรงกันทุกประการ คู่สัญญาทั้งสองฝ่ายได้อ่านและเข้าใจข้อความในสัญญานี้โดยตลอดดีแล้ว เห็นว่าถูกต้องตรงตามเจตนาทุกประการ จึงได้ลงลายมือชื่อไว้เป็นสำคัญต่อหน้าพยาน และต่างยึดถือไว้ฝ่ายละหนึ่งฉบับ
-                  </p>
-                </div>
-
-                <!-- ส่วนลงลายมือชื่อคู่สัญญาและพยาน -->
-                <div class="mt-8 mb-6 space-y-12">
+                <!-- ส่วนลงลายมือชื่อคู่สัญญาและพยาน (รองรับลายเซ็นอิเล็กทรอนิกส์) -->
+                <div class="mt-4 mb-6 space-y-8">
                   <!-- แถวที่ 1: ผู้ให้กู้ และ ผู้กู้ -->
                   <div class="grid grid-cols-2 gap-8 text-center">
-                    <div class="space-y-2">
+                    <div class="space-y-1">
+                      <div class="doc-sig-box">
+                        <img id="doc-sig-img-lender" class="doc-sig-img hidden" alt="ลายเซ็นผู้ให้กู้" />
+                      </div>
                       <div>ลงชื่อ ...................................................... ผู้ให้กู้</div>
                       <div>( <span id="sig-lenderName" class="inline-block min-w-[160px] border-b border-dotted border-slate-400">............................................</span> )</div>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-1">
+                      <div class="doc-sig-box">
+                        <img id="doc-sig-img-borrower" class="doc-sig-img hidden" alt="ลายเซ็นผู้กู้" />
+                      </div>
                       <div>ลงชื่อ ...................................................... ผู้กู้</div>
                       <div>( <span id="sig-borrowerName" class="inline-block min-w-[160px] border-b border-dotted border-slate-400">............................................</span> )</div>
                     </div>
                   </div>
 
                   <!-- แถวที่ 2: พยานคนที่ 1 และ พยานคนที่ 2 -->
-                  <div class="grid grid-cols-2 gap-8 text-center pt-4">
-                    <div class="space-y-2">
+                  <div class="grid grid-cols-2 gap-8 text-center pt-2">
+                    <div class="space-y-1">
+                      <div class="doc-sig-box">
+                        <img id="doc-sig-img-witness1" class="doc-sig-img hidden" alt="ลายเซ็นพยานคนที่ 1" />
+                      </div>
                       <div>ลงชื่อ ...................................................... พยาน</div>
                       <div>( <span id="sig-witness1Name" class="inline-block min-w-[160px] border-b border-dotted border-slate-400">............................................</span> )</div>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-1">
+                      <div class="doc-sig-box">
+                        <img id="doc-sig-img-witness2" class="doc-sig-img hidden" alt="ลายเซ็นพยานคนที่ 2" />
+                      </div>
                       <div>ลงชื่อ ...................................................... พยาน</div>
                       <div>( <span id="sig-witness2Name" class="inline-block min-w-[160px] border-b border-dotted border-slate-400">............................................</span> )</div>
                     </div>
@@ -613,6 +739,42 @@
 
     </div>
   </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 0: หน้าต่างเซ็นลายเซ็นอิเล็กทรอนิกส์แบบเต็มจอ (Full-screen Sign Pad) -->
+  <!-- ===================================================================== -->
+  <div id="fullscreen-sign-modal" class="no-print fixed inset-0 z-50 bg-slate-900/85 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-6">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col">
+      <div class="bg-navy-900 text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-nib text-emerald-400"></i>
+          <h3 class="font-bold text-sm sm:text-base">ลงลายมือชื่ออิเล็กทรอนิกส์: <span id="fs-sign-title" class="text-blue-300">ผู้ให้กู้</span></h3>
+        </div>
+        <button type="button" onclick="closeFullscreenSign()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-4 sm:p-6 bg-slate-50">
+        <div class="relative bg-white border-2 border-dashed border-blue-400 rounded-2xl overflow-hidden h-64 sm:h-72 shadow-inner">
+          <canvas id="canvas-fullscreen" class="sig-canvas w-full h-full block"></canvas>
+          <div class="pointer-events-none absolute bottom-4 left-6 right-6 border-b border-slate-300 text-xs text-slate-400 text-center">วาดลายเซ็นของท่านเหนือเส้นประนี้</div>
+        </div>
+      </div>
+      <div class="bg-white px-5 py-3.5 border-t border-slate-200 flex items-center justify-between gap-2">
+        <button type="button" onclick="clearFullscreenCanvas()" class="px-4 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-eraser"></i> ล้างลายเซ็น
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeFullscreenSign()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs sm:text-sm font-medium hover:bg-slate-100">
+            ยกเลิก
+          </button>
+          <button type="button" onclick="applyFullscreenSign()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow flex items-center gap-1.5">
+            <i class="fa-solid fa-check"></i> ยืนยันใช้ลายเซ็นนี้
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ===================================================================== -->
   <!-- MODAL 1: พรีวิวเอกสาร A4 แบบเต็มหน้าจอ (Full Screen Preview Modal) -->
@@ -807,6 +969,16 @@
     const DB_STORAGE_KEY = 'thai_legal_loan_records_v1';
     const SETTINGS_STORAGE_KEY = 'thai_legal_loan_settings_v1';
 
+    // เก็บข้อมูลรูปลายเซ็นอิเล็กทรอนิกส์ (Base64 PNG) ของแต่ละฝ่าย
+    const signatures = {
+      lender: null,
+      borrower: null,
+      witness1: null,
+      witness2: null
+    };
+    const sigPads = {};
+    let activeFullscreenRole = null;
+
     // เริ่มต้นทำงานเมื่อโหลดหน้าเว็บ
     document.addEventListener('DOMContentLoaded', () => {
       // ตั้งค่าวันที่เริ่มต้นเป็นวันนี้ และวันครบกำหนดอีก 30 วัน
@@ -818,6 +990,7 @@
       document.getElementById('dueDate').value = formatDateInput(nextMonth);
       document.getElementById('contractNumber').value = generateContractNumber();
 
+      initAllSignaturePads();
       loadSettingsToUI();
       updateDatabaseBadge();
       updateContractPreview();
@@ -825,6 +998,238 @@
 
       window.addEventListener('resize', adjustMobileA4Scale);
     });
+
+    // =====================================================================
+    // ระบบลายเซ็นอิเล็กทรอนิกส์ (HTML5 Canvas E-Signature Pad)
+    // =====================================================================
+    function initAllSignaturePads() {
+      ['lender', 'borrower', 'witness1', 'witness2'].forEach((role) => {
+        const canvas = document.getElementById(`canvas-${role}`);
+        if (canvas) {
+          sigPads[role] = setupSignatureCanvas(canvas, (dataUrl) => {
+            signatures[role] = dataUrl;
+            syncSignatureToDocument(role, dataUrl);
+          });
+        }
+      });
+
+      const fsCanvas = document.getElementById('canvas-fullscreen');
+      if (fsCanvas) {
+        sigPads['fullscreen'] = setupSignatureCanvas(fsCanvas, null);
+      }
+    }
+
+    function setupSignatureCanvas(canvas, onStrokeEnd) {
+      const ctx = canvas.getContext('2d');
+      let drawing = false;
+      let hasDrawn = false;
+
+      function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
+        const prevData = hasDrawn ? canvas.toDataURL('image/png') : null;
+
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = 2.4;
+        ctx.strokeStyle = '#0f296e'; // สีน้ำเงินหมึกปากกาเซ็นเอกสาร
+
+        if (prevData) {
+          const img = new Image();
+          img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+          img.src = prevData;
+        }
+      }
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function startDraw(e) {
+        if (e.cancelable) e.preventDefault();
+        drawing = true;
+        hasDrawn = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      }
+
+      function moveDraw(e) {
+        if (!drawing) return;
+        if (e.cancelable) e.preventDefault();
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      }
+
+      function endDraw() {
+        if (!drawing) return;
+        drawing = false;
+        ctx.closePath();
+        if (onStrokeEnd && hasDrawn) {
+          onStrokeEnd(canvas.toDataURL('image/png'));
+        }
+      }
+
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', moveDraw);
+      window.addEventListener('mouseup', endDraw);
+
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', moveDraw, { passive: false });
+      canvas.addEventListener('touchend', endDraw);
+
+      // เรียก resize ครั้งแรก
+      setTimeout(resizeCanvas, 50);
+
+      return {
+        resize: resizeCanvas,
+        clear: () => {
+          const rect = canvas.getBoundingClientRect();
+          ctx.clearRect(0, 0, rect.width || canvas.width, rect.height || canvas.height);
+          hasDrawn = false;
+        },
+        drawImageFromUrl: (url) => {
+          resizeCanvas();
+          const rect = canvas.getBoundingClientRect();
+          ctx.clearRect(0, 0, rect.width, rect.height);
+          if (!url) {
+            hasDrawn = false;
+            return;
+          }
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0, rect.width, rect.height);
+            hasDrawn = true;
+          };
+          img.src = url;
+        },
+        isEmpty: () => !hasDrawn,
+        toDataURL: () => (hasDrawn ? canvas.toDataURL('image/png') : null)
+      };
+    }
+
+    function selectSignerTab(role) {
+      document.querySelectorAll('.sig-role-btn').forEach((btn) => {
+        btn.className = 'sig-role-btn py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-white/60 transition';
+      });
+      const activeBtn = document.getElementById(`sig-tab-${role}`);
+      if (activeBtn) {
+        activeBtn.className = 'sig-role-btn py-1.5 px-2 rounded-lg text-xs font-semibold bg-navy-900 text-white shadow transition';
+      }
+
+      document.querySelectorAll('.sig-panel').forEach((p) => p.classList.add('hidden'));
+      const activePanel = document.getElementById(`sig-panel-${role}`);
+      if (activePanel) {
+        activePanel.classList.remove('hidden');
+      }
+
+      if (sigPads[role]) {
+        setTimeout(() => {
+          sigPads[role].resize();
+          if (signatures[role]) {
+            sigPads[role].drawImageFromUrl(signatures[role]);
+          }
+        }, 30);
+      }
+    }
+
+    function clearSignature(role) {
+      if (sigPads[role]) sigPads[role].clear();
+      signatures[role] = null;
+      syncSignatureToDocument(role, null);
+    }
+
+    function uploadSignatureImage(event, role) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        signatures[role] = dataUrl;
+        if (sigPads[role]) sigPads[role].drawImageFromUrl(dataUrl);
+        syncSignatureToDocument(role, dataUrl);
+        showToast('อัปโหลดรูปลายเซ็นเรียบร้อยแล้ว', 'success');
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function syncSignatureToDocument(role, dataUrl) {
+      const imgEl = document.getElementById(`doc-sig-img-${role}`);
+      const dotEl = document.getElementById(`sig-dot-${role}`);
+      if (imgEl) {
+        if (dataUrl) {
+          imgEl.src = dataUrl;
+          imgEl.classList.remove('hidden');
+        } else {
+          imgEl.src = '';
+          imgEl.classList.add('hidden');
+        }
+      }
+      if (dotEl) {
+        if (dataUrl) dotEl.classList.remove('hidden');
+        else dotEl.classList.add('hidden');
+      }
+    }
+
+    function openFullscreenSign(role) {
+      activeFullscreenRole = role;
+      const roleNames = {
+        lender: 'ผู้ให้กู้ (เจ้าหนี้)',
+        borrower: 'ผู้กู้ (ลูกหนี้)',
+        witness1: 'พยานคนที่ 1',
+        witness2: 'พยานคนที่ 2'
+      };
+      document.getElementById('fs-sign-title').textContent = roleNames[role] || role;
+      const modal = document.getElementById('fullscreen-sign-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      setTimeout(() => {
+        if (sigPads['fullscreen']) {
+          sigPads['fullscreen'].resize();
+          sigPads['fullscreen'].clear();
+        }
+      }, 50);
+    }
+
+    function closeFullscreenSign() {
+      const modal = document.getElementById('fullscreen-sign-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      activeFullscreenRole = null;
+    }
+
+    function clearFullscreenCanvas() {
+      if (sigPads['fullscreen']) sigPads['fullscreen'].clear();
+    }
+
+    function applyFullscreenSign() {
+      if (!activeFullscreenRole || !sigPads['fullscreen']) return;
+      const dataUrl = sigPads['fullscreen'].toDataURL();
+      if (!dataUrl) {
+        showToast('กรุณาวาดลายเซ็นก่อนกดยืนยัน', 'error');
+        return;
+      }
+      signatures[activeFullscreenRole] = dataUrl;
+      if (sigPads[activeFullscreenRole]) {
+        sigPads[activeFullscreenRole].drawImageFromUrl(dataUrl);
+      }
+      syncSignatureToDocument(activeFullscreenRole, dataUrl);
+      closeFullscreenSign();
+      showToast('บันทึกลายเซ็นลงในเอกสารสัญญาแล้ว', 'success');
+    }
 
     // สร้างเลขที่สัญญาอัตโนมัติ
     function generateContractNumber() {
@@ -1071,8 +1476,9 @@
       document.getElementById('dueDate').value = formatDateInput(nextMonth);
       document.getElementById('contractNumber').value = generateContractNumber();
       document.getElementById('interestRate').value = '15';
+      ['lender', 'borrower', 'witness1', 'witness2'].forEach((role) => clearSignature(role));
       updateContractPreview();
-      showToast('ล้างข้อมูลแบบฟอร์มเรียบร้อยแล้ว', 'info');
+      showToast('ล้างข้อมูลแบบฟอร์มและลายเซ็นเรียบร้อยแล้ว', 'info');
     }
 
     // เปิดพรีวิวเต็มจอ
@@ -1086,92 +1492,91 @@
       clone.style.transform = 'none';
       clone.style.marginBottom = '0';
       body.appendChild(clone);
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeFullPreviewModal() {
-      const modal = document.getElementById('full-preview-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    // สั่งพิมพ์ / บันทึก PDF ผ่านเบราว์เซอร์ (รองรับ @page A4 และ Vector Text 100%)
-    function printContractA4() {
-      // ปิด Modal ทั้งหมดก่อนพิมพ์เพื่อให้หน้ากระดาษสะอาด
-      closeFullPreviewModal();
-      closeSettingsModal();
-      closeDatabaseModal();
-
-      // ตรวจสอบให้แน่ใจว่าบนมือถือส่วนพรีวิวไม่ถูกซ่อนตอนสั่งพิมพ์
-      const prevSec = document.getElementById('preview-section');
-      const wasHidden = prevSec.classList.contains('hidden');
-      if (wasHidden) prevSec.classList.remove('hidden');
-
-      setTimeout(() => {
-        window.print();
-        if (wasHidden && window.innerWidth < 1024) {
-          prevSec.classList.add('hidden');
-        }
-      }, 150);
-    }
-
-    // ดาวน์โหลดไฟล์ PDF ขนาด A4 โดยตรงด้วย html2pdf.js
-    function downloadPDF() {
+    // ดาวน์โหลดไฟล์ PDF ขนาด A4 โดยตรงด้วย html2pdf.js (แก้ไขบั๊กหน้าขาว 100%)
+    async function downloadPDF() {
       const btn = document.getElementById('btn-download-pdf');
+      const overlay = document.getElementById('pdf-loading-overlay');
       const originalBtnHTML = btn.innerHTML;
+
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังสร้าง PDF...';
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+
+      // เลื่อนหน้าจอกลับไปด้านบนสุดชั่วคราวเพื่อให้ html2canvas จับพิกัดได้แม่นยำไม่หลุดเฟรม
+      const prevScrollY = window.scrollY;
+      window.scrollTo(0, 0);
 
       const borrowerName = document.getElementById('borrowerName').value.trim() || 'ผู้กู้';
       const contractNo = document.getElementById('contractNumber').value.trim() || 'Contract';
       const filename = `สัญญากู้ยืมเงิน_${contractNo}_${borrowerName}.pdf`;
 
-      // โคลนเอกสารเพื่อรีเซ็ต transform scale ก่อนแปลงเป็น PDF
+      // สร้างคอนเทนเนอร์แสดงผลเต็มขนาด A4 (210mm) บนหน้าจอจริงชั่วคราว (ไม่ใช้ left: -9999px ที่ทำให้เกิดหน้าขาว)
       const sourceElement = document.getElementById('print-area');
-      const cloneContainer = document.createElement('div');
-      cloneContainer.style.position = 'fixed';
-      cloneContainer.style.left = '-9999px';
-      cloneContainer.style.top = '0';
-      cloneContainer.style.width = '210mm';
-      cloneContainer.innerHTML = sourceElement.innerHTML;
-      cloneContainer.classList.add('legal-doc');
+      const renderWrapper = document.createElement('div');
+      renderWrapper.style.position = 'fixed';
+      renderWrapper.style.top = '0';
+      renderWrapper.style.left = '0';
+      renderWrapper.style.width = '210mm';
+      renderWrapper.style.backgroundColor = '#ffffff';
+      renderWrapper.style.zIndex = '90';
+      renderWrapper.style.margin = '0';
+      renderWrapper.style.padding = '0';
+      renderWrapper.style.transform = 'none';
+      renderWrapper.classList.add('legal-doc');
 
-      // ลบ margin-bottom ของแต่ละหน้าออกเพื่อไม่ให้เกิดหน้าว่างแทรกใน html2pdf
-      cloneContainer.querySelectorAll('.a4-page').forEach((page) => {
+      // โคลนเนื้อหาและบังคับขนาด A4 มาตรฐานทุกหน้า
+      renderWrapper.innerHTML = sourceElement.innerHTML;
+      const pages = renderWrapper.querySelectorAll('.a4-page');
+      pages.forEach((page, index) => {
+        page.style.width = '210mm';
+        page.style.height = '296.5mm';
+        page.style.minHeight = '296.5mm';
+        page.style.maxHeight = '296.5mm';
         page.style.margin = '0';
+        page.style.padding = '20mm 22mm';
         page.style.boxShadow = 'none';
+        page.style.backgroundColor = '#ffffff';
+        page.style.pageBreakAfter = index < pages.length - 1 ? 'always' : 'auto';
       });
 
-      document.body.appendChild(cloneContainer);
+      document.body.appendChild(renderWrapper);
+
+      // รอให้เบราว์เซอร์เรนเดอร์ DOM, ฟอนต์ และรูปลายเซ็นให้เสร็จสมบูรณ์ก่อนจับภาพ
+      await new Promise((resolve) => setTimeout(resolve, 350));
 
       const opt = {
         margin: 0,
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: 794,
+          backgroundColor: '#ffffff'
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'] }
       };
 
-      html2pdf()
-        .set(opt)
-        .from(cloneContainer)
-        .save()
-        .then(() => {
-          document.body.removeChild(cloneContainer);
-          btn.disabled = false;
-          btn.innerHTML = originalBtnHTML;
-          showToast('ดาวน์โหลดไฟล์ PDF ขนาด A4 พร้อมลายน้ำสำเร็จ!', 'success');
-        })
-        .catch((err) => {
-          console.error(err);
-          document.body.removeChild(cloneContainer);
-          btn.disabled = false;
-          btn.innerHTML = originalBtnHTML;
-          showToast('เกิดข้อผิดพลาดในการสร้าง PDF กรุณาลองใช้ปุ่ม "พิมพ์ / บันทึก PDF"', 'error');
-        });
+      try {
+        await html2pdf().set(opt).from(renderWrapper).save();
+        showToast('ดาวน์โหลดไฟล์ PDF ขนาด A4 พร้อมลายน้ำและลายเซ็นสำเร็จ!', 'success');
+      } catch (err) {
+        console.error('PDF Generation Error:', err);
+        showToast('เกิดข้อผิดพลาดในการสร้าง PDF กรุณากดปุ่ม "พิมพ์ / บันทึก PDF" แทน', 'error');
+      } finally {
+        if (renderWrapper.parentNode) {
+          document.body.removeChild(renderWrapper);
+        }
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+        btn.disabled = false;
+        btn.innerHTML = originalBtnHTML;
+        window.scrollTo(0, prevScrollY);
+      }
     }
 
     // =====================================================================
@@ -1185,7 +1590,7 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกและส่งข้อมูล...';
 
-      // รวบรวมข้อมูลทั้งหมดจากฟอร์ม
+      // รวบรวมข้อมูลทั้งหมดจากฟอร์ม (รวมภาพลายเซ็นอิเล็กทรอนิกส์)
       const formData = {
         id: 'REC-' + Date.now(),
         createdAt: new Date().toISOString(),
@@ -1208,6 +1613,7 @@
         bankOrCollateral: document.getElementById('bankOrCollateral').value.trim(),
         witness1Name: document.getElementById('witness1Name').value.trim(),
         witness2Name: document.getElementById('witness2Name').value.trim(),
+        signatures: { ...signatures },
         syncStatus: 'บันทึกลงฐานข้อมูลในระบบแล้ว'
       };
 
@@ -1457,6 +1863,17 @@
       document.getElementById('bankOrCollateral').value = rec.bankOrCollateral || '';
       document.getElementById('witness1Name').value = rec.witness1Name || '';
       document.getElementById('witness2Name').value = rec.witness2Name || '';
+
+      // โหลดลายเซ็นอิเล็กทรอนิกส์ที่บันทึกไว้กลับมาแสดงในสัญญา
+      const savedSigs = rec.signatures || {};
+      ['lender', 'borrower', 'witness1', 'witness2'].forEach((role) => {
+        const sigData = savedSigs[role] || null;
+        signatures[role] = sigData;
+        if (sigPads[role]) {
+          sigPads[role].drawImageFromUrl(sigData);
+        }
+        syncSignatureToDocument(role, sigData);
+      });
 
       updateContractPreview();
       closeDatabaseModal();
