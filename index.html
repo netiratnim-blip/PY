@@ -267,8 +267,9 @@
                             <span class="text-xs font-bold text-slate-800"><i class="fa-solid fa-id-card text-emerald-600 mr-1"></i>สำเนาบัตรประชาชน</span>
                             <span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">จำเป็น</span>
                         </div>
-                        <p class="text-[10px] text-slate-500">ถ่ายรูปบัตรประชาชนหรือสำเนาขีดคร่อม "ใช้สำหรับขอสินเชื่อเท่านั้น"</p>
-                        <input type="file" id="idCardInput" accept="image/*" required onchange="previewUpload(this, 'idCardPreview')" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-700 file:text-white file:text-xs cursor-pointer">
+                        <p class="text-[10px] text-slate-500">ถ่ายรูปบัตรประชาชน หรืออัปโหลดไฟล์รูปภาพ / PDF</p>
+                        <input type="file" id="idCardInput" accept="image/*,.pdf,application/pdf" required onchange="handleFileUpload(this, 'idCardPreview', 'idCardFileBadge', 'idCard')" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-700 file:text-white file:text-xs cursor-pointer">
+                        <div id="idCardFileBadge" class="hidden text-[11px] bg-white px-3 py-2 rounded-xl border border-emerald-200 text-emerald-800 font-medium flex items-center gap-2"></div>
                         <img id="idCardPreview" class="hidden w-full max-h-40 object-contain rounded-xl border border-slate-200 bg-white mt-2">
                     </div>
 
@@ -278,8 +279,9 @@
                             <span class="text-xs font-bold text-slate-800"><i class="fa-solid fa-file-invoice-dollar text-slate-600 mr-1"></i>เอกสารแสดงรายได้</span>
                             <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">ไม่จำเป็น / ข้ามได้</span>
                         </div>
-                        <p class="text-[10px] text-slate-500">สลิปเงินเดือน หรือ Statement (หากไม่มีสามารถข้ามได้ทันที)</p>
-                        <input type="file" id="incomeInput" accept="image/*" onchange="previewUpload(this, 'incomePreview')" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-slate-700 file:text-white file:text-xs cursor-pointer">
+                        <p class="text-[10px] text-slate-500">สลิปเงินเดือน หรือ Statement (รูปภาพ / PDF หากไม่มีข้ามได้ทันที)</p>
+                        <input type="file" id="incomeInput" accept="image/*,.pdf,application/pdf" onchange="handleFileUpload(this, 'incomePreview', 'incomeFileBadge', 'income')" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-slate-700 file:text-white file:text-xs cursor-pointer">
+                        <div id="incomeFileBadge" class="hidden text-[11px] bg-white px-3 py-2 rounded-xl border border-slate-200 text-slate-700 font-medium flex items-center gap-2"></div>
                         <img id="incomePreview" class="hidden w-full max-h-40 object-contain rounded-xl border border-slate-200 bg-white mt-2">
                     </div>
                 </div>
@@ -400,10 +402,10 @@
                         <select id="staffFilter" onchange="renderStaffList()" class="text-xs border border-slate-300 rounded-lg px-2 py-1 bg-white">
                             <option value="ALL">ทั้งหมด</option>
                             <option value="รอตรวจสอบ">รอตรวจสอบ</option>
-                            <option value="กำลังตรวจสอบเอกสาร">กำลังตรวจสอบเอกสาร</option>
+                            <option value="กำลังพิจารณา">กำลังพิจารณา</option>
                             <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
-                            <option value="โอนเงินแล้ว">โอนเงินแล้ว</option>
-                            <option value="ไม่ผ่านการอนุมัติ">ไม่ผ่านการอนุมัติ</option>
+                            <option value="โอนเงินเรียบร้อย">โอนเงินเรียบร้อย</option>
+                            <option value="ไม่ผ่านเกณฑ์">ไม่ผ่านเกณฑ์</option>
                         </select>
                     </div>
                     <div id="staffList" class="space-y-2.5"></div>
@@ -451,38 +453,9 @@
                 <button onclick="toggleScriptModal(false)" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-4 overflow-y-auto space-y-3 text-xs">
-                <p class="text-slate-600">1. เปิด Google Sheet > เมนู <strong>ส่วนขยาย (Extensions) > Apps Script</strong><br>2. วางโค้ดนี้ แก้ไขอีเมลใน <code>ADMIN_EMAIL</code> แล้วกด <strong>Deploy > Web app (Anyone)</strong></p>
+                <p class="text-slate-600">1. เปิด Google Sheet &gt; เมนู <strong>ส่วนขยาย (Extensions) &gt; Apps Script</strong><br>2. วางโค้ดนี้ แก้ไขอีเมลใน <code>ADMIN_EMAIL</code> แล้วกด <strong>Deploy &gt; Web app (Anyone)</strong></p>
                 <button onclick="copyGasCode()" class="w-full py-2 bg-emerald-600 text-white font-semibold rounded-xl">คัดลอกโค้ดทั้งหมด</button>
-                <pre id="gasCodeText" class="bg-slate-900 text-emerald-300 p-3 rounded-xl overflow-x-auto text-[11px] font-mono">const ADMIN_EMAIL = "YOUR_EMAIL@gmail.com";
-
-function doPost(e) {
-  const data = JSON.parse(e.postData.contents);
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName("Loans") || ss.insertSheet("Loans");
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["วันที่", "รหัสกู้", "สถานะ", "ชื่อ-สกุล", "เลขบัตร", "โทร", "อีเมล", "อาชีพ", "ธนาคาร", "รูปแบบ", "วงเงิน", "ค่างวด", "ลิงก์บัตร ปชช.", "ลิงก์เอกสารรายได้"]);
-  }
-  const folder = DriveApp.getFoldersByName("LoanDocs").hasNext() ? DriveApp.getFoldersByName("LoanDocs").next() : DriveApp.createFolder("LoanDocs");
-  let idUrl = "-", incUrl = "-", files = [];
-  if (data.idCardBase64) {
-    const b1 = Utilities.newBlob(Utilities.base64Decode(data.idCardBase64.split(",")[1]), "image/jpeg", data.loanId + "_IDCard.jpg");
-    const f1 = folder.createFile(b1); f1.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    idUrl = f1.getUrl(); files.push(b1);
-  }
-  if (data.incomeBase64) {
-    const b2 = Utilities.newBlob(Utilities.base64Decode(data.incomeBase64.split(",")[1]), "image/jpeg", data.loanId + "_Income.jpg");
-    const f2 = folder.createFile(b2); f2.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    incUrl = f2.getUrl(); files.push(b2);
-  }
-  sheet.appendRow([data.timestamp, data.loanId, data.status, data.fullName, "'" + data.nationalId, "'" + data.phone, data.email, data.occupation, data.bankInfo, data.repayType, data.amount, data.installmentText, idUrl, incUrl]);
-  MailApp.sendEmail({
-    to: data.adminEmail || ADMIN_EMAIL,
-    subject: "[คำขอสินเชื่อใหม่] " + data.loanId + " - " + data.fullName,
-    body: "รหัสกู้: " + data.loanId + "\nผู้กู้: " + data.fullName + "\nโทร: " + data.phone + "\nวงเงิน: " + data.amount + " บาท (" + data.repayType + ")\nค่างวด: " + data.installmentText + "\nบัญชี: " + data.bankInfo + "\nสำเนาบัตร ปชช.: " + idUrl,
-    attachments: files
-  });
-  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
-}</pre>
+                <pre id="gasCodeText" class="bg-slate-900 text-emerald-300 p-3 rounded-xl overflow-x-auto text-[11px] font-mono"></pre>
             </div>
         </div>
     </div>
@@ -491,95 +464,171 @@ function doPost(e) {
         const STORAGE_KEY = 'thaitrust_loans_v2';
         let currentLoanId = '';
         let homeCalcMode = 'daily';
-        let idCardBase64 = '';
-        let incomeBase64 = '';
+        let idCardData = { base64: '', mime: '', name: '' };
+        let incomeData = { base64: '', mime: '', name: '' };
+        let isFileReading = false;
 
-        window.onload = function() {
-            generateLoanId();
-            updateHomeCalc();
-            updateApplyTerms();
-            renderRecentChips();
-            const savedUrl = localStorage.getItem('thaitrust_gas_url') || '';
-            const savedEmail = localStorage.getItem('thaitrust_admin_email') || '';
-            document.getElementById('cfgScriptUrl').value = savedUrl;
-            document.getElementById('cfgAdminEmail').value = savedEmail;
-            if (sessionStorage.getItem('thaitrust_staff') === '1') showStaffUI();
-        };
+        // Google Apps Script Source stored cleanly in JS Array to avoid HTML parser issues
+        const GAS_SOURCE_LINES = [
+            'const ADMIN_EMAIL = "YOUR_EMAIL@gmail.com";',
+            '',
+            'function doPost(e) {',
+            '  const data = JSON.parse(e.postData.contents);',
+            '  const ss = SpreadsheetApp.getActiveSpreadsheet();',
+            '  let sheet = ss.getSheetByName("Loans") || ss.insertSheet("Loans");',
+            '  if (sheet.getLastRow() === 0) {',
+            '    sheet.appendRow(["วันที่", "รหัสกู้", "สถานะ", "ชื่อ-สกุล", "เลขบัตร", "โทร", "อีเมล", "อาชีพ", "ธนาคาร", "รูปแบบ", "วงเงิน", "ค่างวด", "ลิงก์บัตร ปชช.", "ลิงก์เอกสารรายได้"]);',
+            '  }',
+            '  const folder = DriveApp.getFoldersByName("LoanDocs").hasNext() ? DriveApp.getFoldersByName("LoanDocs").next() : DriveApp.createFolder("LoanDocs");',
+            '  let idUrl = "-", incUrl = "-", files = [];',
+            '  if (data.idCardBase64 && data.idCardBase64.indexOf(",") > -1) {',
+            '    const mime1 = data.idCardMime || "image/jpeg";',
+            '    const ext1 = mime1.indexOf("pdf") > -1 ? ".pdf" : ".jpg";',
+            '    const b1 = Utilities.newBlob(Utilities.base64Decode(data.idCardBase64.split(",")[1]), mime1, data.loanId + "_IDCard" + ext1);',
+            '    const f1 = folder.createFile(b1); f1.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);',
+            '    idUrl = f1.getUrl(); files.push(b1);',
+            '  }',
+            '  if (data.incomeBase64 && data.incomeBase64.indexOf(",") > -1) {',
+            '    const mime2 = data.incomeMime || "image/jpeg";',
+            '    const ext2 = mime2.indexOf("pdf") > -1 ? ".pdf" : ".jpg";',
+            '    const b2 = Utilities.newBlob(Utilities.base64Decode(data.incomeBase64.split(",")[1]), mime2, data.loanId + "_Income" + ext2);',
+            '    const f2 = folder.createFile(b2); f2.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);',
+            '    incUrl = f2.getUrl(); files.push(b2);',
+            '  }',
+            '  sheet.appendRow([data.timestamp, data.loanId, data.status, data.fullName, "\'" + data.nationalId, "\'" + data.phone, data.email, data.occupation, data.bankInfo, data.repayType, data.amount, data.installmentText, idUrl, incUrl]);',
+            '  MailApp.sendEmail({',
+            '    to: data.adminEmail || ADMIN_EMAIL,',
+            '    subject: "[คำขอสินเชื่อใหม่] " + data.loanId + " - " + data.fullName,',
+            '    body: "รหัสกู้: " + data.loanId + "\\nผู้กู้: " + data.fullName + "\\nโทร: " + data.phone + "\\nอีเมล: " + data.email + "\\nวงเงิน: " + data.amount + " บาท (" + data.repayType + ")\\nค่างวด: " + data.installmentText + "\\nบัญชี: " + data.bankInfo + "\\nสำเนาบัตร ปชช.: " + idUrl + "\\nเอกสารรายได้: " + incUrl,',
+            '    attachments: files',
+            '  });',
+            '  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);',
+            '}'
+        ];
 
         // Toast Helper
-        function showToast(msg, isErr = false) {
-            const t = document.getElementById('toast');
-            document.getElementById('toastText').textContent = msg;
-            document.getElementById('toastIcon').className = isErr ? 'fa-solid fa-circle-exclamation text-red-400 text-base' : 'fa-solid fa-circle-check text-emerald-400 text-base';
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3500);
+        function showToast(msg, isError) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastText');
+            if (!toast || !icon || !text) return;
+            text.textContent = msg;
+            icon.className = isError
+                ? 'fa-solid fa-circle-exclamation text-rose-400 text-base'
+                : 'fa-solid fa-circle-check text-emerald-400 text-base';
+            toast.classList.remove('hidden');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.add('hidden'), 3200);
         }
 
-        // PDPA Modal
+        // PDPA Consent Functions
         function checkPdpa() {
-            const ok = document.getElementById('pdpa1').checked && document.getElementById('pdpa2').checked;
+            const c1 = document.getElementById('pdpa1');
+            const c2 = document.getElementById('pdpa2');
             const btn = document.getElementById('pdpaAcceptBtn');
+            if (!c1 || !c2 || !btn) return;
+            const ok = c1.checked && c2.checked;
             btn.disabled = !ok;
-            btn.className = ok ? 'w-full py-3 rounded-2xl font-semibold text-sm text-white bg-emerald-700 hover:bg-emerald-800 cursor-pointer transition' : 'w-full py-3 rounded-2xl font-semibold text-sm text-white bg-slate-300 cursor-not-allowed transition';
-        }
-        function acceptPdpa() {
-            document.getElementById('pdpaModal').classList.add('hidden');
-            showToast('บันทึกความยินยอม PDPA เรียบร้อยแล้ว');
+            if (ok) {
+                btn.className = 'w-full py-3 rounded-2xl font-semibold text-sm text-white bg-emerald-700 hover:bg-emerald-800 shadow-md cursor-pointer transition';
+            } else {
+                btn.className = 'w-full py-3 rounded-2xl font-semibold text-sm text-white bg-slate-300 cursor-not-allowed transition';
+            }
         }
 
-        // Tab Navigation
-        function switchTab(tab) {
+        function acceptPdpa() {
+            const c1 = document.getElementById('pdpa1');
+            const c2 = document.getElementById('pdpa2');
+            if (!c1 || !c2 || !c1.checked || !c2.checked) {
+                showToast('กรุณาติ๊กยินยอมครบทั้ง 2 ข้อก่อนเข้าใช้งาน', true);
+                return;
+            }
+            const modal = document.getElementById('pdpaModal');
+            if (modal) modal.classList.add('hidden');
+            try { sessionStorage.setItem('thaitrust_pdpa_ok', '1'); } catch (e) {}
+            showToast('ยินดีต้อนรับสู่ ThaiTrust Loan');
+        }
+
+        // Bottom Navigation Tab Switcher
+        function switchTab(tabName) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => {
-                n.classList.remove('text-emerald-700', 'bg-emerald-50', 'font-semibold');
-                n.classList.add('text-slate-500');
+            const target = document.getElementById('tab-' + tabName);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('text-emerald-700', 'bg-emerald-50', 'font-semibold');
+                btn.classList.add('text-slate-500');
             });
-            document.getElementById('tab-' + tab).classList.add('active');
-            const activeNav = document.getElementById('nav-' + tab);
-            activeNav.classList.remove('text-slate-500');
-            activeNav.classList.add('text-emerald-700', 'bg-emerald-50', 'font-semibold');
-            if (tab === 'track') renderRecentChips();
-            if (tab === 'staff' && sessionStorage.getItem('thaitrust_staff') === '1') renderStaffList();
+            const navBtn = document.getElementById('nav-' + tabName);
+            if (navBtn) {
+                navBtn.classList.remove('text-slate-500');
+                navBtn.classList.add('text-emerald-700', 'bg-emerald-50', 'font-semibold');
+            }
+
+            if (tabName === 'track') renderRecentChips();
+            if (tabName === 'staff' && sessionStorage.getItem('thaitrust_staff') === '1') {
+                showStaffUI();
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Home Quick Calculator
+        // Home Calculator Logic (15% APR)
         function setHomeCalcMode(mode) {
             homeCalcMode = mode;
-            document.getElementById('homeModeDaily').className = mode === 'daily' ? 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg text-slate-600';
-            document.getElementById('homeModeMonthly').className = mode === 'monthly' ? 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg text-slate-600';
+            const dBtn = document.getElementById('homeModeDaily');
+            const mBtn = document.getElementById('homeModeMonthly');
+            if (mode === 'daily') {
+                dBtn.className = 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-sm';
+                mBtn.className = 'px-2.5 py-1 rounded-lg text-slate-600';
+            } else {
+                mBtn.className = 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-sm';
+                dBtn.className = 'px-2.5 py-1 rounded-lg text-slate-600';
+            }
             updateHomeCalc();
         }
+
         function updateHomeCalc() {
-            const amt = Number(document.getElementById('homeAmtSlider').value);
+            const amt = Number(document.getElementById('homeAmtSlider').value || 10000);
             document.getElementById('homeAmtLabel').textContent = amt.toLocaleString() + ' บาท';
             if (homeCalcMode === 'daily') {
-                const total = amt + (amt * 0.15 * (30 / 365));
-                document.getElementById('homeTermLabel').textContent = 'ผ่อน 30 วัน (ดอกเบี้ย 15%/ปี)';
-                document.getElementById('homeInstallmentVal').textContent = Math.ceil(total / 30).toLocaleString() + ' บาท / วัน';
+                const days = 30;
+                const interest = amt * 0.15 * (days / 365);
+                const perDay = Math.ceil((amt + interest) / days);
+                document.getElementById('homeTermLabel').textContent = `ผ่อน ${days} วัน (ดอกเบี้ย 15%/ปี)`;
+                document.getElementById('homeInstallmentVal').textContent = `${perDay.toLocaleString()} บาท / วัน`;
             } else {
-                const total = amt + (amt * 0.15 * (6 / 12));
-                document.getElementById('homeTermLabel').textContent = 'ผ่อน 6 เดือน (ดอกเบี้ย 15%/ปี)';
-                document.getElementById('homeInstallmentVal').textContent = Math.ceil(total / 6).toLocaleString() + ' บาท / เดือน';
+                const months = 6;
+                const interest = amt * 0.15 * (months / 12);
+                const perMonth = Math.ceil((amt + interest) / months);
+                document.getElementById('homeTermLabel').textContent = `ผ่อน ${months} เดือน (ดอกเบี้ย 15%/ปี)`;
+                document.getElementById('homeInstallmentVal').textContent = `${perMonth.toLocaleString()} บาท / เดือน`;
             }
         }
+
         function transferCalcToApply() {
             const amt = document.getElementById('homeAmtSlider').value;
-            const val = homeCalcMode === 'daily' ? 'รายวัน (Daily)' : 'รายเดือน (Monthly)';
-            document.querySelector(`input[name="repayType"][value="${val}"]`).checked = true;
+            const radios = document.querySelectorAll('input[name="repayType"]');
+            radios.forEach(r => {
+                if (homeCalcMode === 'daily' && r.value.includes('รายวัน')) r.checked = true;
+                if (homeCalcMode === 'monthly' && r.value.includes('รายเดือน')) r.checked = true;
+            });
             updateApplyTerms();
             syncApplyAmt(amt);
             switchTab('apply');
         }
 
-        // Loan ID Generator
+        // Auto Loan ID Generator
         function generateLoanId() {
             const d = new Date();
-            const ymd = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
-            const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const ymd = d.getFullYear().toString() +
+                String(d.getMonth() + 1).padStart(2, '0') +
+                String(d.getDate()).padStart(2, '0');
+            const rand = Math.floor(1000 + Math.random() * 9000);
             currentLoanId = `LN-${ymd}-${rand}`;
-            document.getElementById('loanIdDisplay').textContent = currentLoanId;
+            const disp = document.getElementById('loanIdDisplay');
+            if (disp) disp.textContent = currentLoanId;
         }
+
         function copyLoanId() {
             const el = document.createElement('textarea');
             el.value = currentLoanId;
@@ -590,343 +639,94 @@ function doPost(e) {
             showToast('คัดลอกรหัส ' + currentLoanId + ' แล้ว');
         }
 
-        // Apply Form Calculator
+        // Apply Tab Loan Calculator
         function updateApplyTerms() {
-            const isDaily = document.querySelector('input[name="repayType"]:checked').value.includes('รายวัน');
+            const checked = document.querySelector('input[name="repayType"]:checked');
+            const isDaily = checked ? checked.value.includes('รายวัน') : true;
             const sel = document.getElementById('applyTermSelect');
-            sel.innerHTML = isDaily
-                ? '<option value="7">7 วัน</option><option value="15">15 วัน</option><option value="30" selected>30 วัน</option><option value="60">60 วัน</option>'
-                : '<option value="3">3 เดือน</option><option value="6" selected>6 เดือน</option><option value="12">12 เดือน</option><option value="24">24 เดือน</option>';
+            if (!sel) return;
+            if (isDaily) {
+                sel.innerHTML = [15, 30, 45, 60, 90].map(d =>
+                    `<option value="${d}" ${d === 30 ? 'selected' : ''}>ผ่อนรายวัน ${d} วัน (งวดละ 1 วัน)</option>`
+                ).join('');
+            } else {
+                sel.innerHTML = [3, 6, 9, 12, 18, 24].map(m =>
+                    `<option value="${m}" ${m === 6 ? 'selected' : ''}>ผ่อนรายเดือน ${m} เดือน (งวดละ 1 เดือน)</option>`
+                ).join('');
+            }
             calculateApplyLoan();
         }
-        function syncApplyAmt(v) {
-            let num = Math.min(50000, Math.max(1000, Number(v) || 1000));
-            document.getElementById('applyAmtRange').value = num;
+
+        function syncApplyAmt(val) {
+            let num = Number(val) || 1000;
+            if (num > 50000) num = 50000;
+            document.getElementById('applyAmtRange').value = Math.max(1000, num);
             document.getElementById('applyAmtInput').value = num;
             document.getElementById('applyAmtText').textContent = num.toLocaleString() + ' บาท';
             calculateApplyLoan();
         }
+
         function calculateApplyLoan() {
-            const p = Number(document.getElementById('applyAmtInput').value) || 1000;
-            const term = Number(document.getElementById('applyTermSelect').value) || 30;
-            const isDaily = document.querySelector('input[name="repayType"]:checked').value.includes('รายวัน');
-            const interest = isDaily ? p * 0.15 * (term / 365) : p * 0.15 * (term / 12);
-            const total = p + interest;
-            const inst = Math.ceil(total / term);
-            document.getElementById('calcPrincipal').textContent = p.toLocaleString();
+            const principal = Math.max(1000, Number(document.getElementById('applyAmtInput').value) || 10000);
+            const checked = document.querySelector('input[name="repayType"]:checked');
+            const isDaily = checked ? checked.value.includes('รายวัน') : true;
+            const term = Number(document.getElementById('applyTermSelect').value) || (isDaily ? 30 : 6);
+
+            const interest = isDaily
+                ? principal * 0.15 * (term / 365)
+                : principal * 0.15 * (term / 12);
+            const total = principal + interest;
+            const installment = Math.ceil(total / term);
+
+            document.getElementById('calcPrincipal').textContent = principal.toLocaleString();
             document.getElementById('calcInterest').textContent = interest.toFixed(2);
             document.getElementById('calcTotal').textContent = total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('applyInstallment').textContent = `${inst.toLocaleString()} บาท/${isDaily ? 'วัน' : 'เดือน'} (${term} งวด)`;
+            document.getElementById('applyInstallment').textContent = isDaily
+                ? `${installment.toLocaleString()} บาท/วัน (${term} วัน)`
+                : `${installment.toLocaleString()} บาท/เดือน (${term} เดือน)`;
         }
 
-        // Thai ID Checksum Validation
+        // Thai ID Checksum Validation (Supports 13-digit real IDs & test pattern e.g. 1111111111111)
         function checkThaiId(input) {
-            input.value = input.value.replace(/[^0-9]/g, '');
-            const id = input.value;
-            const hint = document.getElementById('idHint');
-            if (id.length < 13) {
-                hint.textContent = `กรอกแล้ว ${id.length}/13 หลัก`;
-                hint.className = 'text-[10px] text-slate-400 mt-1';
-                return false;
-            }
-            let sum = 0;
-            for (let i = 0; i < 12; i++) sum += Number(id[i]) * (13 - i);
-            const valid = ((11 - (sum % 11)) % 10) === Number(id[12]);
-            hint.textContent = valid ? 'เลขบัตรประชาชนถูกต้อง' : 'เลขบัตรประชาชนไม่ถูกต้อง กรุณาตรวจสอบ';
-            hint.className = valid ? 'text-[10px] text-emerald-600 font-semibold mt-1' : 'text-[10px] text-red-600 font-semibold mt-1';
-            return valid;
-        }
-
-        // File Upload & Compress/Base64
-        function previewUpload(input, imgId) {
-            const file = input.files[0];
-            const img = document.getElementById(imgId);
-            if (!file) { img.classList.add('hidden'); return; }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const tempImg = new Image();
-                tempImg.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxW = 800;
-                    const scale = Math.min(1, maxW / tempImg.width);
-                    canvas.width = tempImg.width * scale;
-                    canvas.height = tempImg.height * scale;
-                    canvas.getContext('2d').drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-                    const compressed = canvas.toDataURL('image/jpeg', 0.75);
-                    img.src = compressed;
-                    img.classList.remove('hidden');
-                    if (imgId === 'idCardPreview') idCardBase64 = compressed;
-                    else incomeBase64 = compressed;
-                };
-                tempImg.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Submit Loan Form
-        async function submitLoanApplication(e) {
-            e.preventDefault();
-            if (!checkThaiId(document.getElementById('nationalId'))) {
-                showToast('กรุณากรอกเลขบัตรประชาชน 13 หลักให้ถูกต้อง', true);
-                return;
-            }
-            if (!idCardBase64) {
-                showToast('กรุณาอัปโหลดสำเนาบัตรประชาชน', true);
-                return;
-            }
-
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>กำลังส่งข้อมูล...';
-
-            const record = {
-                loanId: currentLoanId,
-                timestamp: new Date().toLocaleString('th-TH'),
-                status: 'รอตรวจสอบ',
-                staffNote: 'ได้รับคำขอสินเชื่อแล้ว อยู่ระหว่างรอเจ้าหน้าที่ตรวจสอบเอกสาร',
-                repayType: document.querySelector('input[name="repayType"]:checked').value,
-                amount: document.getElementById('applyAmtInput').value,
-                installmentText: document.getElementById('applyInstallment').textContent,
-                fullName: document.getElementById('fullName').value.trim(),
-                nationalId: document.getElementById('nationalId').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                occupation: document.getElementById('occupation').value.trim(),
-                bankInfo: `${document.getElementById('bankName').value} (${document.getElementById('bankAccount').value.trim()})`,
-                idCardBase64: idCardBase64,
-                incomeBase64: incomeBase64,
-                adminEmail: localStorage.getItem('thaitrust_admin_email') || ''
-            };
-
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            list.unshift(record);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-
-            // Send to Google Apps Script (if configured)
-            const gasUrl = localStorage.getItem('thaitrust_gas_url');
-            if (gasUrl) {
-                fetch(gasUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(record) }).catch(() => {});
-            }
-
-            // Show Receipt
-            document.getElementById('recLoanId').textContent = record.loanId;
-            document.getElementById('recName').textContent = record.fullName;
-            document.getElementById('recLoan').textContent = `${record.repayType} • ${Number(record.amount).toLocaleString()} บาท`;
-            document.getElementById('recInstallment').textContent = record.installmentText;
-            document.getElementById('recBank').textContent = record.bankInfo;
-
-            document.getElementById('loanForm').classList.add('hidden');
-            document.getElementById('receiptCard').classList.remove('hidden');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i>ส่งคำขอสินเชื่อทันที';
-            showToast('ส่งคำขอสินเชื่อสำเร็จ!');
-        }
-
-        function resetApplyForm() {
-            document.getElementById('loanForm').reset();
-            idCardBase64 = '';
-            incomeBase64 = '';
-            document.getElementById('idCardPreview').classList.add('hidden');
-            document.getElementById('incomePreview').classList.add('hidden');
-            generateLoanId();
-            updateApplyTerms();
-            document.getElementById('receiptCard').classList.add('hidden');
-            document.getElementById('loanForm').classList.remove('hidden');
-        }
-
-        function goTrackReceipt() {
-            document.getElementById('trackInput').value = document.getElementById('recLoanId').textContent;
-            switchTab('track');
-            searchStatus();
-        }
-
-        // Status Tracking
-        function renderRecentChips() {
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const box = document.getElementById('recentChips');
-            box.innerHTML = list.slice(0, 4).map(item =>
-                `<button onclick="document.getElementById('trackInput').value='${item.loanId}';searchStatus()" class="text-[11px] font-mono bg-slate-100 hover:bg-emerald-50 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200">${item.loanId}</button>`
-            ).join('');
-        }
-
-        function searchStatus() {
-            const q = document.getElementById('trackInput').value.trim().toUpperCase();
-            const out = document.getElementById('trackResult');
-            if (!q) { showToast('กรุณากรอกรหัสการกู้หรือเบอร์โทร', true); return; }
-
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const matches = list.filter(i => i.loanId.toUpperCase() === q || i.phone === q);
-
-            if (matches.length === 0) {
-                out.innerHTML = `<div class="bg-white rounded-3xl p-6 text-center text-xs text-slate-500 border border-slate-100">ไม่พบข้อมูลคำขอสำหรับ "${q}"</div>`;
-                return;
-            }
-
-            const stepsMap = { 'รอตรวจสอบ': 1, 'กำลังตรวจสอบเอกสาร': 2, 'อนุมัติแล้ว': 3, 'โอนเงินแล้ว': 4, 'ไม่ผ่านการอนุมัติ': -1 };
-            out.innerHTML = matches.map(item => {
-                const st = stepsMap[item.status] || 1;
-                const badgeCls = st === -1 ? 'bg-red-100 text-red-700' : (st >= 3 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800');
-                return `
-                <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                        <div>
-                            <span class="text-[10px] text-slate-400 block">รหัสอ้างอิง</span>
-                            <strong class="font-mono text-sm text-slate-900">${item.loanId}</strong>
-                        </div>
-                        <span class="text-xs font-bold px-3 py-1 rounded-full ${badgeCls}">${item.status}</span>
-                    </div>
-                    <div class="space-y-2.5 text-xs pl-1">
-                        ${renderTimelineStep(1, st, '1. ยื่นคำขอสินเชื่อสำเร็จ', item.timestamp)}
-                        ${renderTimelineStep(2, st, '2. ตรวจสอบข้อมูลและเอกสาร', 'เจ้าหน้าที่กำลังตรวจสอบ')}
-                        ${renderTimelineStep(3, st, st === -1 ? '3. ไม่ผ่านการอนุมัติ' : '3. อนุมัติวงเงินสินเชื่อ', '')}
-                        ${renderTimelineStep(4, st, '4. โอนเงินเข้าบัญชีเรียบร้อย', item.bankInfo)}
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
-                        <strong class="text-slate-700 block mb-0.5">หมายเหตุจากเจ้าหน้าที่:</strong>
-                        <p class="text-slate-600">${item.staffNote || '-'}</p>
-                    </div>
-                    <div class="flex justify-between text-xs pt-1 text-slate-600">
-                        <span>ผู้กู้: <strong>${item.fullName}</strong></span>
-                        <span>ยอดกู้: <strong class="text-emerald-700">${Number(item.amount).toLocaleString()} ฿</strong></span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function renderTimelineStep(stepNum, currentStep, title, sub) {
-            const isRejected = currentStep === -1 && stepNum === 3;
-            const done = currentStep >= stepNum;
-            const dotCls = isRejected ? 'bg-red-500 text-white' : (done ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-400');
-            return `
-            <div class="flex items-start gap-2.5">
-                <span class="w-5 h-5 rounded-full ${dotCls} flex items-center justify-center text-[10px] shrink-0 mt-0.5">
-                    <i class="fa-solid ${isRejected ? 'fa-xmark' : 'fa-check'}"></i>
-                </span>
-                <div>
-                    <p class="font-semibold ${done || isRejected ? 'text-slate-800' : 'text-slate-400'}">${title}</p>
-                    ${sub ? `<p class="text-[10px] text-slate-400">${sub}</p>` : ''}
-                </div>
-            </div>`;
-        }
-
-        // Staff Portal
-        function staffLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('staffUser').value.trim();
-            const p = document.getElementById('staffPass').value.trim();
-            if (u === '@Bch1323' && p === '1323') {
-                sessionStorage.setItem('thaitrust_staff', '1');
-                document.getElementById('staffUser').value = '';
-                document.getElementById('staffPass').value = '';
-                showStaffUI();
-                showToast('เข้าสู่ระบบเจ้าหน้าที่สำเร็จ');
-            } else {
-                showToast('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง', true);
-            }
-        }
-        function staffLogout() {
-            sessionStorage.removeItem('thaitrust_staff');
-            document.getElementById('staffDashboard').classList.add('hidden');
-            document.getElementById('staffLoginBox').classList.remove('hidden');
-        }
-        function showStaffUI() {
-            document.getElementById('staffLoginBox').classList.add('hidden');
-            document.getElementById('staffDashboard').classList.remove('hidden');
-            renderStaffList();
-        }
-        function saveStaffConfig() {
-            localStorage.setItem('thaitrust_gas_url', document.getElementById('cfgScriptUrl').value.trim());
-            localStorage.setItem('thaitrust_admin_email', document.getElementById('cfgAdminEmail').value.trim());
-            showToast('บันทึกการตั้งค่า Google Sheet และอีเมลแล้ว');
-        }
-        function renderStaffList() {
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            document.getElementById('stTotal').textContent = list.length;
-            document.getElementById('stPending').textContent = list.filter(i => i.status === 'รอตรวจสอบ' || i.status === 'กำลังตรวจสอบเอกสาร').length;
-            document.getElementById('stApproved').textContent = list.filter(i => i.status === 'อนุมัติแล้ว' || i.status === 'โอนเงินแล้ว').length;
-
-            const filter = document.getElementById('staffFilter').value;
-            const filtered = filter === 'ALL' ? list : list.filter(i => i.status === filter);
-            const container = document.getElementById('staffList');
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-xs text-slate-400 border border-slate-100">ไม่มีรายการในหมวดหมู่นี้</div>`;
-                return;
-            }
-            container.innerHTML = filtered.map(item => `
-                <div onclick="openDetailModal('${item.loanId}')" class="bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-600 cursor-pointer transition space-y-1.5 shadow-sm">
-                    <div class="flex justify-between items-center">
-                        <span class="font-mono text-xs font-bold text-slate-900">${item.loanId}</span>
-                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">${item.status}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-xs font-bold text-slate-800">${item.fullName}</p>
-                            <p class="text-[11px] text-slate-500">${item.phone} • ${item.repayType}</p>
-                        </div>
-                        <strong class="text-sm text-emerald-700">${Number(item.amount).toLocaleString()} ฿</strong>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openDetailModal(loanId) {
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const item = list.find(i => i.loanId === loanId);
-            if (!item) return;
-
-            document.getElementById('modalHeaderTitle').textContent = `${item.loanId} - ${item.fullName}`;
-            document.getElementById('modalBody').innerHTML = `
-                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
-                    <label class="font-bold text-slate-800 block">อัปเดตสถานะคำขอ</label>
-                    <select id="updStatus" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold">
-                        ${['รอตรวจสอบ', 'กำลังตรวจสอบเอกสาร', 'อนุมัติแล้ว', 'โอนเงินแล้ว', 'ไม่ผ่านการอนุมัติ'].map(s => `<option value="${s}" ${item.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-                    </select>
-                    <input type="text" id="updNote" value="${item.staffNote || ''}" placeholder="ข้อความแจ้งผู้กู้..." class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white">
-                    <button onclick="saveStatusChange('${item.loanId}')" class="w-full py-2.5 bg-emerald-700 text-white font-bold rounded-xl">บันทึกสถานะ</button>
-                </div>
-                <div class="space-y-1 border-b border-slate-100 pb-2.5">
-                    <p><strong>เลขบัตรประชาชน:</strong> ${item.nationalId}</p>
-                    <p><strong>เบอร์โทร:</strong> <a href="tel:${item.phone}" class="text-emerald-700 underline font-bold">${item.phone}</a> | <strong>อีเมล:</strong> ${item.email}</p>
-                    <p><strong>อาชีพ/รายได้:</strong> ${item.occupation}</p>
-                    <p><strong>บัญชีรับเงิน:</strong> ${item.bankInfo}</p>
-                    <p><strong>วงเงิน/ค่างวด:</strong> ${Number(item.amount).toLocaleString()} บาท (${item.installmentText})</p>
-                </div>
-                <div class="space-y-2">
-                    <p class="font-bold text-slate-800">สำเนาบัตรประชาชน:</p>
-                    ${item.idCardBase64 ? `<img src="${item.idCardBase64}" onclick="window.open(this.src)" class="w-full max-h-48 object-contain rounded-xl border cursor-pointer bg-slate-100">` : '<p class="text-slate-400">ไม่มีรูปภาพ</p>'}
-                    <p class="font-bold text-slate-800 pt-2">เอกสารแสดงรายได้:</p>
-                    ${item.incomeBase64 ? `<img src="${item.incomeBase64}" onclick="window.open(this.src)" class="w-full max-h-48 object-contain rounded-xl border cursor-pointer bg-slate-100">` : '<p class="text-slate-400">ไม่ได้แนบเอกสารรายได้</p>'}
-                </div>
-            `;
-            document.getElementById('detailModal').classList.remove('hidden');
-        }
-        function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
-        function saveStatusChange(loanId) {
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const idx = list.findIndex(i => i.loanId === loanId);
-            if (idx !== -1) {
-                list[idx].status = document.getElementById('updStatus').value;
-                list[idx].staffNote = document.getElementById('updNote').value.trim();
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-            }
-            closeDetailModal();
-            renderStaffList();
-            showToast('อัปเดตสถานะเรียบร้อยแล้ว');
-        }
-
-        function toggleScriptModal(show) {
-            document.getElementById('scriptModal').classList.toggle('hidden', !show);
-        }
+// ... existing code ... -->
         function copyGasCode() {
             const el = document.createElement('textarea');
-            el.value = document.getElementById('gasCodeText').textContent;
+            el.value = GAS_SOURCE_LINES.join('\n');
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
             showToast('คัดลอกโค้ด Google Apps Script แล้ว');
         }
+
+        // App Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            const gasPre = document.getElementById('gasCodeText');
+            if (gasPre) gasPre.textContent = GAS_SOURCE_LINES.join('\n');
+
+            const c1 = document.getElementById('pdpa1');
+            const c2 = document.getElementById('pdpa2');
+            const acceptBtn = document.getElementById('pdpaAcceptBtn');
+            if (c1) c1.addEventListener('change', checkPdpa);
+            if (c2) c2.addEventListener('change', checkPdpa);
+            if (acceptBtn) acceptBtn.addEventListener('click', acceptPdpa);
+
+            if (sessionStorage.getItem('thaitrust_pdpa_ok') === '1') {
+                const modal = document.getElementById('pdpaModal');
+                if (modal) modal.classList.add('hidden');
+            } else {
+                checkPdpa();
+            }
+
+            const savedUrl = localStorage.getItem('thaitrust_gas_url') || '';
+            const savedEmail = localStorage.getItem('thaitrust_admin_email') || '';
+            if (document.getElementById('cfgScriptUrl')) document.getElementById('cfgScriptUrl').value = savedUrl;
+            if (document.getElementById('cfgAdminEmail')) document.getElementById('cfgAdminEmail').value = savedEmail;
+
+            generateLoanId();
+            updateHomeCalc();
+            updateApplyTerms();
+        });
     </script>
 </body>
 </html>
