@@ -3,211 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ระบบยื่นขอสินเชื่อส่วนบุคคลออนไลน์</title>
+  <title>ระบบยื่นคำขอสินเชื่อส่วนบุคคลอย่างเป็นทางการ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- เรียกใช้ QRCode.js สำหรับสร้างคิวอาร์โค้ดยืนยันสถานะ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
-      --pastel-red: #ff8a8a;
-      --pastel-red-dark: #f26464;
-      --pastel-red-soft: #fff0f0;
-      --pastel-green: #6ee7b7;
-      --pastel-green-dark: #10b981;
-      --pastel-green-soft: #ecfdf5;
+      --navy-primary: #0f2942;
+      --navy-dark: #091a2c;
+      --navy-light: #1e4268;
+      --gold-accent: #b48a3e;
+      --gold-bg: #fbf8f1;
+      --emerald-ok: #0d6e4c;
+      --slate-bg: #f1f5f9;
+      --border-color: #cbd5e1;
       --text-main: #1e293b;
-      --text-muted: #64748b;
-      --glass-bg: rgba(255, 255, 255, 0.86);
-      --glass-border: rgba(255, 255, 255, 0.95);
+      --text-muted: #475569;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Prompt', sans-serif;
+      font-family: 'Sarabun', sans-serif;
     }
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #ffe4e6 0%, #f8fafc 48%, #d1fae5 100%);
+      background-color: var(--slate-bg);
+      background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px);
+      background-size: 20px 20px;
       color: var(--text-main);
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 24px 16px 60px;
-      position: relative;
-      overflow-x: hidden;
+      padding: 28px 16px 64px;
     }
 
-    /* แสงฟุ้งพาสเทลพื้นหลัง */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(70px);
-      z-index: 0;
-      pointer-events: none;
-      animation: floatOrb 10s ease-in-out infinite alternate;
-    }
-    .orb-red {
-      width: 340px;
-      height: 340px;
-      background: rgba(255, 138, 138, 0.45);
-      top: -80px;
-      left: -80px;
-    }
-    .orb-green {
-      width: 380px;
-      height: 380px;
-      background: rgba(110, 231, 183, 0.48);
-      bottom: -90px;
-      right: -90px;
-      animation-delay: -5s;
-    }
-
-    @keyframes floatOrb {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(25px, 25px) scale(1.08); }
-    }
-
-    /* กล่องหลัก */
+    /* กล่องหลักสไตล์องค์กรทางการ */
     .container {
       width: 100%;
-      max-width: 540px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1.5px solid var(--glass-border);
-      border-radius: 28px;
-      padding: 28px 24px;
-      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      max-width: 600px;
+      background: #ffffff;
+      border-top: 6px solid var(--navy-primary);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(15, 41, 66, 0.1);
+      padding: 32px 28px;
       position: relative;
-      z-index: 1;
     }
 
-    .header {
-      text-align: center;
+    .official-header {
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 18px;
       margin-bottom: 24px;
+      text-align: center;
     }
 
-    .badge {
+    .doc-ref {
       display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 600;
-      background: linear-gradient(90deg, var(--pastel-red-soft), var(--pastel-green-soft));
-      border: 1px solid rgba(242, 100, 100, 0.25);
-      color: #0f766e;
+      letter-spacing: 0.5px;
+      color: var(--gold-accent);
+      background: var(--gold-bg);
+      border: 1px solid rgba(180, 138, 62, 0.35);
+      padding: 4px 12px;
+      border-radius: 4px;
       margin-bottom: 10px;
     }
 
-    .header h1 {
+    .official-header h1 {
       font-size: 1.55rem;
       font-weight: 700;
-      background: linear-gradient(120deg, #e11d48, #059669);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--navy-primary);
       margin-bottom: 6px;
     }
 
-    .header p {
-      font-size: 0.9rem;
+    .official-header p {
+      font-size: 0.92rem;
       color: var(--text-muted);
     }
 
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy-primary);
+      background: #f8fafc;
+      border-left: 4px solid var(--navy-primary);
+      padding: 8px 12px;
+      margin: 22px 0 14px;
+    }
+
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     label {
       display: block;
       font-size: 0.92rem;
-      font-weight: 500;
-      margin-bottom: 7px;
+      font-weight: 600;
       color: #334155;
+      margin-bottom: 6px;
     }
 
     label span.req {
-      color: #ef4444;
+      color: #dc2626;
       margin-left: 2px;
     }
 
     input[type="text"],
     input[type="number"],
     input[type="tel"],
-    select {
+    input[type="email"] {
       width: 100%;
-      padding: 13px 15px;
-      border-radius: 14px;
-      border: 1.5px solid #e2e8f0;
-      background: rgba(255, 255, 255, 0.95);
-      font-size: 0.98rem;
+      padding: 11px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      font-size: 0.96rem;
       color: var(--text-main);
-      transition: all 0.2s ease;
+      transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
     }
 
-    input:focus, select:focus {
-      border-color: var(--pastel-green-dark);
-      box-shadow: 0 0 0 4px rgba(110, 231, 183, 0.28);
+    input:focus {
+      border-color: var(--navy-primary);
+      box-shadow: 0 0 0 3px rgba(15, 41, 66, 0.12);
     }
 
     .row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    /* ตัวเลือกประเภทสินเชื่อ */
-    .loan-type-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .radio-card {
-      position: relative;
-      cursor: pointer;
-    }
-
-    .radio-card input {
-      position: absolute;
-      opacity: 0;
-    }
-
-    .radio-card-box {
-      padding: 12px;
-      border-radius: 14px;
-      border: 1.5px solid #e2e8f0;
-      background: #ffffff;
-      text-align: center;
-      transition: all 0.2s ease;
-    }
-
-    .radio-card input:checked + .radio-card-box {
-      border-color: var(--pastel-green-dark);
-      background: linear-gradient(135deg, #fff1f2, #ecfdf5);
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.14);
-    }
-
-    .radio-card-title {
-      font-weight: 600;
-      font-size: 0.92rem;
-      color: var(--text-main);
-    }
-
-    .radio-card-sub {
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      margin-top: 2px;
+      gap: 14px;
     }
 
     /* ตัวเลือกอาชีพ */
     .job-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 10px;
     }
 
     .job-card {
@@ -221,166 +157,256 @@
     .job-card-box {
       padding: 11px 8px;
       text-align: center;
-      border-radius: 12px;
-      border: 1.5px solid #e2e8f0;
-      background: #fff;
-      font-size: 0.88rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      font-size: 0.92rem;
       font-weight: 500;
-      transition: all 0.2s ease;
+      color: #334155;
+      transition: all 0.2s;
     }
 
     .job-card input:checked + .job-card-box {
-      border-color: var(--pastel-red-dark);
-      background: #fff1f2;
-      color: #be123c;
+      border-color: var(--navy-primary);
+      background: var(--navy-primary);
+      color: #ffffff;
       font-weight: 600;
+    }
+
+    /* กล่องแจ้งเตือนพิเศษสำหรับนักศึกษา */
+    .student-alert {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 4px solid #d97706;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+      color: #78350f;
+      line-height: 1.55;
+      display: block;
+    }
+
+    .student-alert strong {
+      display: block;
+      color: #92400e;
+      margin-bottom: 3px;
+      font-size: 0.9rem;
     }
 
     #otherJobWrapper {
       display: none;
       margin-top: 10px;
-      animation: fadeIn 0.25s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* รูปแบบสินเชื่อ */
+    .loan-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
-    /* กล่องคำนวณสินเชื่อ */
+    .radio-card {
+      cursor: pointer;
+    }
+
+    .radio-card input {
+      display: none;
+    }
+
+    .radio-card-box {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .radio-card input:checked + .radio-card-box {
+      border-color: var(--navy-primary);
+      background: #eff6ff;
+      box-shadow: inset 0 0 0 1px var(--navy-primary);
+    }
+
+    .radio-card-title {
+      font-weight: 700;
+      font-size: 0.94rem;
+      color: var(--navy-primary);
+    }
+
+    .radio-card-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ตารางคำนวณสินเชื่อทางการ */
     .calc-box {
-      background: linear-gradient(145deg, rgba(255, 241, 242, 0.85), rgba(236, 253, 245, 0.9));
-      border: 1.5px solid rgba(110, 231, 183, 0.6);
-      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
       padding: 16px;
       margin-bottom: 18px;
     }
 
-    .calc-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .calc-header span {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #065f46;
-    }
-
     .quick-days {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       margin-bottom: 12px;
-      flex-wrap: wrap;
     }
 
     .day-btn {
       flex: 1;
-      min-width: 60px;
-      padding: 7px 8px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      font-size: 0.82rem;
-      font-weight: 500;
+      padding: 7px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--navy-primary);
       cursor: pointer;
-      transition: all 0.15s;
     }
 
     .day-btn.active {
-      background: #10b981;
-      color: #fff;
-      border-color: #10b981;
-      font-weight: 600;
+      background: var(--navy-primary);
+      color: #ffffff;
+      border-color: var(--navy-primary);
     }
 
-    .calc-summary {
+    .calc-table {
+      width: 100%;
+      border-collapse: collapse;
       background: #ffffff;
-      border-radius: 14px;
-      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
       font-size: 0.88rem;
     }
 
-    .calc-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 0;
-      border-bottom: 1px dashed #e2e8f0;
+    .calc-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #e2e8f0;
     }
 
-    .calc-row:last-child {
-      border-bottom: none;
-      padding-top: 8px;
+    .calc-table td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .calc-table tr.total-row {
+      background: #f1f5f9;
       font-weight: 700;
-      font-size: 0.98rem;
-      color: #059669;
+      color: var(--navy-primary);
+      font-size: 0.96rem;
     }
 
-    /* กล่องแจ้งค่าปรับและค่าทวงถาม */
-    .fee-notice {
-      background: #fff8f8;
-      border: 1px solid #fecdd3;
-      border-radius: 14px;
-      padding: 12px 14px;
+    /* ข้อกำหนดและค่าธรรมเนียมทางกฎหมาย */
+    .legal-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #b91c1c;
+      border-radius: 6px;
+      padding: 14px;
       margin-bottom: 20px;
-      font-size: 0.8rem;
-      color: #475569;
-      line-height: 1.55;
+      font-size: 0.84rem;
+      color: #334155;
+      line-height: 1.6;
     }
 
-    .fee-notice strong {
-      color: #be123c;
+    .legal-box strong.title {
       display: block;
-      margin-bottom: 4px;
-      font-size: 0.85rem;
+      color: #991b1b;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
     }
 
-    /* ปุ่มส่งข้อมูล */
+    .legal-box ul {
+      padding-left: 18px;
+    }
+
+    .legal-box li {
+      margin-bottom: 4px;
+    }
+
+    /* แถบแจ้งเตือนสถานะการส่งข้อมูล */
+    .status-banner {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-banner.sending {
+      display: flex;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+
+    .status-banner.error {
+      display: flex;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid #93c5fd;
+      border-top-color: #1e40af;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .btn-submit {
       width: 100%;
-      padding: 16px;
+      padding: 15px;
       border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #fb7185 0%, #10b981 100%);
+      border-radius: 6px;
+      background: var(--navy-primary);
       color: #ffffff;
-      font-size: 1.08rem;
-      font-weight: 600;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
       cursor: pointer;
-      box-shadow: 0 12px 24px rgba(16, 185, 129, 0.28);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      transition: background 0.2s;
     }
 
     .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 28px rgba(244, 63, 94, 0.3);
+      background: var(--navy-light);
     }
 
     .btn-submit:disabled {
-      opacity: 0.65;
+      background: #94a3b8;
       cursor: not-allowed;
-      transform: none;
     }
 
     .error-msg {
-      color: #e11d48;
+      color: #dc2626;
       font-size: 0.82rem;
-      margin-top: 5px;
+      margin-top: 4px;
       display: none;
     }
 
-    /* Modal PDPA & Success */
+    /* Modal PDPA & Slip */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(8px);
+      background: rgba(9, 26, 44, 0.72);
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 16px;
       z-index: 9999;
+      overflow-y: auto;
     }
 
     .modal-overlay.hidden {
@@ -389,198 +415,264 @@
 
     .modal-card {
       width: 100%;
-      max-width: 450px;
+      max-width: 480px;
       background: #ffffff;
-      border-radius: 26px;
-      padding: 26px 22px;
-      text-align: center;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.22);
-      border: 2px solid #ffe4e6;
-      animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes popUp {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+      border-radius: 10px;
+      border-top: 5px solid var(--navy-primary);
+      padding: 24px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+      margin: auto;
     }
 
     .pdpa-scroll {
-      max-height: 220px;
+      max-height: 230px;
       overflow-y: auto;
-      text-align: left;
       background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
       padding: 14px;
-      font-size: 0.84rem;
+      font-size: 0.85rem;
       color: #334155;
       line-height: 1.6;
       margin: 14px 0 18px;
     }
 
-    .btn-pdpa {
+    .btn-official {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border: none;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #f43f5e, #10b981);
-      color: #fff;
-      font-size: 0.98rem;
+      border-radius: 6px;
+      background: var(--navy-primary);
+      color: #ffffff;
+      font-size: 0.96rem;
       font-weight: 600;
       cursor: pointer;
     }
 
-    /* เครื่องหมายถูกแอนิเมชัน */
-    .checkmark-circle {
-      width: 78px;
-      height: 78px;
-      border-radius: 50%;
-      background: #ecfdf5;
-      border: 3px solid #10b981;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 auto 16px;
-      animation: scaleBounce 0.5s ease;
-    }
-
-    @keyframes scaleBounce {
-      0% { transform: scale(0); }
-      70% { transform: scale(1.12); }
-      100% { transform: scale(1); }
-    }
-
-    .checkmark-svg {
-      width: 42px;
-      height: 42px;
-      stroke: #10b981;
-      stroke-width: 4;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-dasharray: 60;
-      stroke-dashoffset: 60;
-      animation: drawCheck 0.55s 0.2s forwards ease-out;
-    }
-
-    @keyframes drawCheck {
-      to { stroke-dashoffset: 0; }
-    }
-
-    .tracking-box {
-      background: linear-gradient(135deg, #fff1f2, #ecfdf5);
-      border: 1.5px dashed #10b981;
-      border-radius: 14px;
-      padding: 12px;
-      margin: 14px 0;
-    }
-
-    .tracking-code {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #be123c;
-      letter-spacing: 1px;
-      margin: 4px 0 8px;
-    }
-
-    .btn-copy {
-      padding: 6px 14px;
+    /* สลิปยืนยันการขอสินเชื่อ */
+    .slip-container {
+      border: 1.5px solid #cbd5e1;
       border-radius: 8px;
-      border: 1px solid #10b981;
       background: #ffffff;
-      color: #059669;
-      font-size: 0.82rem;
+      padding: 18px;
+      position: relative;
+      margin-bottom: 16px;
+      background-image: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+    }
+
+    .slip-header {
+      text-align: center;
+      border-bottom: 1.5px dashed #94a3b8;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .slip-badge {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    .slip-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      padding: 5px 0;
+      border-bottom: 1px dotted #e2e8f0;
+    }
+
+    .slip-row span:first-child {
+      color: var(--text-muted);
+    }
+
+    .slip-row span:last-child {
+      font-weight: 600;
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .qr-section {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1.5px dashed #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    #qrcodeBox {
+      padding: 6px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .qr-info {
+      font-size: 0.8rem;
+      color: #475569;
+      line-height: 1.45;
+    }
+
+    .slip-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-outline {
+      padding: 10px;
+      border: 1px solid var(--navy-primary);
+      background: #ffffff;
+      color: var(--navy-primary);
+      border-radius: 6px;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
     }
 
-    @media (max-width: 420px) {
-      .row-2 { grid-template-columns: 1fr; }
-      .job-grid { grid-template-columns: 1fr; }
+    @media (max-width: 480px) {
+      .row-2, .job-grid { grid-template-columns: 1fr; }
+      .qr-section { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
 <body>
-  <div class="orb orb-red"></div>
-  <div class="orb orb-green"></div>
 
-  <!-- หน้าต่าง PDPA -->
+  <!-- 1. หน้าต่างแจ้งเตือน PDPA -->
   <div id="pdpaModal" class="modal-overlay">
     <div class="modal-card">
-      <span class="badge">ข้อตกลงและนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
-      <h2 style="font-size: 1.25rem; color: #1e293b;">โปรดอ่านและยอมรับเงื่อนไขก่อนยื่นกู้</h2>
+      <div class="doc-ref">ประกาศความเป็นส่วนตัวและข้อตกลงทางกฎหมาย (PDPA)</div>
+      <h2 style="font-size: 1.25rem; color: var(--navy-primary);">ข้อกำหนดและเงื่อนไขการขอสินเชื่อ</h2>
       <div class="pdpa-scroll">
-        <p><strong>1. การเก็บรวบรวมและใช้ข้อมูลส่วนบุคคล (PDPA):</strong><br>
-        ข้าพเจ้ายินยอมให้ผู้ให้บริการเก็บรวบรวม ใช้ และประมวลผลข้อมูลส่วนบุคคลที่กรอกในแบบฟอร์มนี้ เพื่อวัตถุประสงค์ในการพิจารณาสินเชื่อ ตรวจสอบคุณสมบัติ และติดต่อกลับแจ้งผลการอนุมัติ</p>
+        <p><strong>1. การคุ้มครองข้อมูลส่วนบุคคล (PDPA):</strong><br>
+        ผู้ขอสินเชื่อยินยอมให้ผู้ให้บริการเก็บรวบรวม ใช้ และตรวจสอบข้อมูลส่วนบุคคลในแบบฟอร์มนี้ เพื่อการพิจารณาสินเชื่อ การจัดทำสัญญา และการติดต่อแจ้งผลการอนุมัติ</p>
         <br>
-        <p><strong>2. ประเภทสินเชื่อและอัตราดอกเบี้ย:</strong><br>
-        บริการนี้เป็น<strong>สินเชื่อส่วนบุคคลประเภทชำระรายวัน และรายเดือน (ระยะเวลาไม่เกิน 1 เดือน)</strong> โดยคิดอัตราดอกเบี้ยและค่าธรรมเนียมตามที่กฎหมายกำหนด (ไม่เกิน 15% ต่อปี)</p>
+        <p><strong>2. เงื่อนไขสินเชื่อและค่าธรรมเนียม:</strong><br>
+        ให้บริการสินเชื่อส่วนบุคคลประเภทชำระรายวัน และรายเดือน (ระยะเวลาไม่เกิน 1 เดือน) อัตราดอกเบี้ยตามกฎหมายกำหนด มีค่าจัดทำเอกสารสัญญา 100 บาทต่อฉบับ ค่าอากรแสตมป์ตามกฎหมาย และค่าติดตามทวงถาม 50 บาทต่อครั้ง</p>
         <br>
-        <p><strong>3. การยอมรับข้อผูกพันทางสัญญา:</strong><br>
-        หากผู้ขอสินเชื่อกดตกลงยอมรับเงื่อนไขและส่งข้อมูลเพื่อขอรับสินเชื่อ <strong>ถือว่าผู้กู้ได้อ่าน เข้าใจ และยอมรับเงื่อนไขข้อตกลงทั้งหมดโดยสมบูรณ์ และไม่มีสิทธิ์โต้แย้งหรือเรียกร้องสิทธิ์ใดๆ ภายหลัง</strong></p>
+        <p><strong>3. ผลผูกพันทางกฎหมาย:</strong><br>
+        การกดปุ่มยอมรับและส่งข้อมูลถือว่าผู้กู้รับทราบและตกลงตามเงื่อนไขทุกประการ <strong>โดยไม่มีสิทธิ์โต้แย้งภายหลัง</strong> และหากผิดนัดชำระเกินกำหนด ผู้ให้กู้มีสิทธิ์ดำเนินการตามกฎหมายทันทีตามเอกสารสัญญาที่ผู้กู้ได้ยินยอมไว้</p>
       </div>
-      <button type="button" id="acceptPdpaBtn" class="btn-pdpa">ยอมรับเงื่อนไขทั้งหมดและดำเนินการต่อ</button>
+      <button type="button" id="acceptPdpaBtn" class="btn-official">ข้าพเจ้ายอมรับเงื่อนไขทั้งหมดและดำเนินการต่อ</button>
     </div>
   </div>
 
-  <!-- หน้าต่างแจ้งผลสำเร็จ -->
+  <!-- 2. หน้าต่างแสดงสลิปยืนยัน + QR Code หลังส่งข้อมูลสำเร็จ -->
   <div id="successModal" class="modal-overlay hidden">
     <div class="modal-card">
-      <div class="checkmark-circle">
-        <svg class="checkmark-svg" viewBox="0 0 52 52">
-          <path d="M14 27l7 7 16-16" />
-        </svg>
+      <div class="slip-container" id="receiptArea">
+        <div class="slip-header">
+          <span class="slip-badge">✓ บันทึกข้อมูลและส่งคำขอสำเร็จ</span>
+          <h3 style="font-size: 1.15rem; color: var(--navy-primary);">ใบยืนยันการยื่นคำขอสินเชื่อ</h3>
+          <div style="font-size: 0.78rem; color: #64748b;" id="slipTimestamp">วันที่ทำรายการ: -</div>
+        </div>
+
+        <div class="slip-row">
+          <span>เลขที่อ้างอิง / ติดตามสถานะ</span>
+          <span id="slipTrackingId" style="color: var(--navy-primary); font-weight: 700;">-</span>
+        </div>
+        <div class="slip-row">
+          <span>ชื่อ-นามสกุล ผู้ขอกู้</span>
+          <span id="slipName">-</span>
+        </div>
+        <div class="slip-row">
+          <span>สถานะอาชีพ</span>
+          <span id="slipJob">-</span>
+        </div>
+        <div class="slip-row">
+          <span>เบอร์โทร / อีเมลแจ้งผล</span>
+          <span id="slipContact">-</span>
+        </div>
+        <div class="slip-row">
+          <span>วงเงินขอกู้ (เงินต้น)</span>
+          <span id="slipAmount">-</span>
+        </div>
+        <div class="slip-row">
+          <span>รูปแบบ / ระยะเวลา</span>
+          <span id="slipTerm">-</span>
+        </div>
+        <div class="slip-row">
+          <span>อัตราดอกเบี้ยตามกฎหมาย</span>
+          <span>15% ต่อปี (ตามระยะเวลากู้)</span>
+        </div>
+        <div class="slip-row">
+          <span>ค่าทำเอกสารสัญญา</span>
+          <span>100.00 บาท / ฉบับ</span>
+        </div>
+        <div class="slip-row">
+          <span>ยอดชำระคืนรวมโดยประมาณ</span>
+          <span id="slipTotal" style="color: var(--emerald-ok); font-weight: 700;">-</span>
+        </div>
+
+        <div class="qr-section">
+          <div id="qrcodeBox"></div>
+          <div class="qr-info">
+            <strong style="color: var(--navy-primary); display: block; margin-bottom: 3px;">QR Code ยืนยันสถานะสินเชื่อ</strong>
+            โปรดบันทึกภาพหน้าจอสลิปนี้ไว้ เพื่อใช้แสดงและยืนยันตัวตนเมื่อเจ้าหน้าที่ติดต่อกลับภายใน 1-2 วันทำการ
+          </div>
+        </div>
       </div>
-      <h2 style="font-size: 1.3rem; color: #065f46; margin-bottom: 8px;">ส่งข้อมูลเรียบร้อยแล้ว!</h2>
-      <p style="font-size: 0.92rem; color: #475569; line-height: 1.6;">
-        ขอบคุณที่ให้ความสนใจ<br>
-        <strong>เราจะติดต่อกลับคุณภายใน 1-2 วันทำการ ขอบคุณค่ะ</strong>
+
+      <p style="font-size: 0.84rem; color: #334155; text-align: center; margin-bottom: 12px; line-height: 1.5;">
+        ขอบคุณที่ให้ความสนใจสินเชื่อของเรา เจ้าหน้าที่จะตรวจสอบข้อมูลและติดต่อกลับคุณภายใน <strong>1-2 วันทำการ</strong> ขอบคุณค่ะ
       </p>
 
-      <div class="tracking-box">
-        <div style="font-size: 0.8rem; color: #64748b;">เลขติดตามสถานะของคุณ</div>
-        <div id="trackingIdText" class="tracking-code">LN-2026-000000</div>
-        <button type="button" id="copyTrackingBtn" class="btn-copy">คัดลอกเลขติดตามสถานะ</button>
-        <p style="font-size: 0.78rem; color: #475569; margin-top: 8px;">
-          * คุณสามารถบันทึกเลขตรวจสอบสถานะนี้ไว้เพื่อยืนยันตัวตนหลังจากเจ้าหน้าที่ติดต่อกลับไป
-        </p>
+      <div class="slip-actions">
+        <button type="button" id="copyTrackingBtn" class="btn-outline">คัดลอกเลขติดตามสถานะ</button>
+        <button type="button" onclick="window.print()" class="btn-outline">พิมพ์ / บันทึกสลิป PDF</button>
       </div>
-
-      <button type="button" onclick="window.location.reload()" class="btn-pdpa" style="margin-top: 6px;">เสร็จสิ้น / กลับหน้าหลัก</button>
+      <button type="button" onclick="window.location.reload()" class="btn-official">เสร็จสิ้นและปิดหน้าต่าง</button>
     </div>
   </div>
 
-  <!-- แบบฟอร์มหลัก -->
+  <!-- 3. แบบฟอร์มยื่นขอสินเชื่อหลัก -->
   <main class="container">
-    <div class="header">
-      <span class="badge">อนุมัติไว • ดอกเบี้ยตามกฎหมายกำหนด</span>
-      <h1>แบบฟอร์มขอสินเชื่อส่วนบุคคล</h1>
-      <p>สินเชื่อรายวัน และรายเดือน (ระยะเวลาไม่เกิน 1 เดือน)</p>
+    <div class="official-header">
+      <div class="doc-ref">แบบฟอร์มคำขอสินเชื่อส่วนบุคคลออนไลน์</div>
+      <h1>ยื่นคำขอพิจารณาสินเชื่อส่วนบุคคล</h1>
+      <p>บริการสินเชื่อรายวัน และรายเดือน (ระยะเวลาไม่เกิน 1 เดือน) ภายใต้กรอบกฎหมาย</p>
     </div>
 
     <form id="loanForm" novalidate>
+      <div class="section-title">ส่วนที่ 1 : ข้อมูลส่วนบุคคลของผู้ขอกู้</div>
+
       <div class="form-group">
-        <label for="fullName">ชื่อ - นามสกุล <span class="req">*</span></label>
+        <label for="fullName">ชื่อ - นามสกุล (ตามบัตรประชาชน) <span class="req">*</span></label>
         <input type="text" id="fullName" placeholder="ระบุชื่อและนามสกุลจริง" required />
-        <div id="errName" class="error-msg">กรุณากรอกชื่อ - นามสกุล</div>
+        <div id="errName" class="error-msg">กรุณาระบุชื่อ - นามสกุลให้ครบถ้วน</div>
       </div>
 
       <div class="row-2">
         <div class="form-group">
           <label for="age">อายุ (ปีบริบูรณ์) <span class="req">*</span></label>
-          <input type="number" id="age" min="18" max="80" placeholder="18 ปีขึ้นไป" required />
-          <div id="errAge" class="error-msg">ผู้กู้ต้องมีอายุ 18 ปีขึ้นไป</div>
+          <input type="number" id="age" min="18" max="80" placeholder="ตั้งแต่ 18 ปีขึ้นไป" required />
+          <div id="errAge" class="error-msg">ผู้ขอกู้ต้องมีอายุ 18 ปีบริบูรณ์ขึ้นไป</div>
         </div>
 
         <div class="form-group">
-          <label for="phone">เบอร์โทรศัพท์แจ้งผล <span class="req">*</span></label>
+          <label for="phone">เบอร์โทรศัพท์ติดต่อแจ้งผล <span class="req">*</span></label>
           <input type="tel" id="phone" maxlength="12" placeholder="08X-XXX-XXXX" required />
-          <div id="errPhone" class="error-msg">กรุณากรอกเบอร์โทรศัพท์ 10 หลัก</div>
+          <div id="errPhone" class="error-msg">กรุณาระบุเบอร์โทรศัพท์ให้ครบ 10 หลัก</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label>อาชีพปัจจุบัน <span class="req">*</span></label>
+        <label for="email">อีเมลสำหรับรับเอกสารและแจ้งสถานะ <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="example@email.com" required />
+        <div id="errEmail" class="error-msg">กรุณาระบุรูปแบบอีเมลให้ถูกต้อง</div>
+      </div>
+
+      <div class="form-group">
+        <label>สถานะอาชีพปัจจุบัน <span class="req">*</span></label>
         <div class="job-grid">
           <label class="job-card">
             <input type="radio" name="occupation" value="นักศึกษา" checked />
@@ -595,52 +687,56 @@
             <div class="job-card-box">อื่นๆ</div>
           </label>
         </div>
+
+        <!-- กล่องแจ้งเตือนเงื่อนไขนักศึกษา (เด้งแสดงเมื่อเลือกนักศึกษา) -->
+        <div id="studentNoticeBox" class="student-alert">
+          <strong>ประกาศเงื่อนไขสำหรับผู้กู้สถานะนักเรียน - นักศึกษา :</strong>
+          เนื่องจากผู้กู้มีสถานะเป็นนักเรียน-นักศึกษา ยอดเงินกู้สูงสุด <strong>ไม่เกิน 2,000 บาท ต่อ 7 วัน</strong> และ <strong>ไม่เกิน 5,000 บาท ต่อ 30 วัน</strong> โปรดทราบว่ากรณีผู้กู้อายุต่ำกว่า 20 ปีบริบูรณ์ ผู้ปกครองควรเซ็นยินยอมรับทราบในเอกสารแนบด้วยทุกครั้ง ทั้งนี้ ผลการพิจารณาอนุมัติขึ้นอยู่กับความพร้อมและความสามารถในการชำระคืนของผู้กู้เป็นหลัก
+        </div>
+
         <div id="otherJobWrapper">
-          <input type="text" id="otherJobInput" placeholder="โปรดระบุอาชีพของคุณ..." />
+          <input type="text" id="otherJobInput" placeholder="โปรดระบุอาชีพของคุณให้ชัดเจน..." />
         </div>
         <div id="errJob" class="error-msg">กรุณาระบุอาชีพของคุณ</div>
       </div>
 
+      <div class="section-title">ส่วนที่ 2 : รายละเอียดวงเงินและการคำนวณชำระคืน</div>
+
       <div class="row-2">
         <div class="form-group">
-          <label for="income">รายได้ต่อเดือน (บาท) <span class="req">*</span></label>
-          <input type="text" id="income" inputmode="numeric" placeholder="เช่น 15,000" required />
+          <label for="income">รายได้ / รายรับต่อเดือน (บาท) <span class="req">*</span></label>
+          <input type="text" id="income" inputmode="numeric" placeholder="เช่น 12,000" required />
           <div id="errIncome" class="error-msg">กรุณาระบุรายได้ต่อเดือน</div>
         </div>
 
         <div class="form-group">
           <label for="loanAmount">จำนวนเงินที่ต้องการกู้ (บาท) <span class="req">*</span></label>
           <input type="text" id="loanAmount" inputmode="numeric" value="1,000" placeholder="เช่น 1,000" required />
-          <div id="errAmount" class="error-msg">กรุณาระบุจำนวนเงินกู้</div>
+          <div id="errAmount" class="error-msg">กรุณาระบุจำนวนเงินกู้ที่ถูกต้อง</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label>รูปแบบการผ่อนชำระ <span class="req">*</span></label>
+        <label>ประเภทการผ่อนชำระ <span class="req">*</span></label>
         <div class="loan-type-grid">
           <label class="radio-card">
             <input type="radio" name="loanType" value="รายวัน" checked />
             <div class="radio-card-box">
               <div class="radio-card-title">สินเชื่อรายวัน</div>
-              <div class="radio-card-sub">ทยอยจ่ายคืนทุกวัน</div>
+              <div class="radio-card-sub">ชำระเฉลี่ยรายวันตามกำหนด</div>
             </div>
           </label>
           <label class="radio-card">
             <input type="radio" name="loanType" value="รายเดือน (ไม่เกิน 1 เดือน)" />
             <div class="radio-card-box">
               <div class="radio-card-title">สินเชื่อรายเดือน</div>
-              <div class="radio-card-sub">ปิดยอดไม่เกิน 30 วัน</div>
+              <div class="radio-card-sub">ชำระปิดยอดไม่เกิน 30 วัน</div>
             </div>
           </label>
         </div>
       </div>
 
-      <!-- กล่องคำนวณดอกเบี้ยอัตโนมัติ -->
       <div class="calc-box">
-        <div class="calc-header">
-          <span>คำนวณยอดชำระอัตโนมัติ (ดอกเบี้ย 15%/ปี)</span>
-        </div>
-
         <div class="quick-days">
           <button type="button" class="day-btn" data-days="7">7 วัน</button>
           <button type="button" class="day-btn" data-days="15">15 วัน</button>
@@ -648,69 +744,76 @@
           <button type="button" class="day-btn active" data-days="30">30 วัน</button>
         </div>
 
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label for="loanDays" style="font-size: 0.82rem;">กำหนดจำนวนวันกู้ (สูงสุด 30 วัน)</label>
-          <input type="number" id="loanDays" min="1" max="30" value="30" style="padding: 9px 12px; font-size: 0.9rem;" />
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="loanDays" style="font-size: 0.85rem;">ระยะเวลากู้ยืม (1 - 30 วัน)</label>
+          <input type="number" id="loanDays" min="1" max="30" value="30" />
         </div>
 
-        <div class="calc-summary">
-          <div class="calc-row">
-            <span>เงินต้นขอกู้</span>
-            <span id="sumPrincipal">1,000.00 บาท</span>
-          </div>
-          <div class="calc-row">
-            <span>ดอกเบี้ยตามกฎหมาย (15% ต่อปี)</span>
-            <span id="sumInterest">12.33 บาท</span>
-          </div>
-          <div class="calc-row">
-            <span>ค่าอากรแสตมป์ทำสัญญา</span>
-            <span id="sumStamp">1.00 บาท</span>
-          </div>
-          <div class="calc-row">
-            <span id="payLabel">ยอดผ่อนชำระเฉลี่ยต่อวัน (30 วัน)</span>
-            <span id="sumInstallment">33.74 บาท / วัน</span>
-          </div>
-          <div class="calc-row">
-            <span>ยอดชำระคืนรวมทั้งสิ้น</span>
-            <span id="sumTotal">1,012.33 บาท</span>
-          </div>
-        </div>
+        <table class="calc-table">
+          <tr>
+            <td>เงินต้นขอกู้</td>
+            <td id="sumPrincipal">1,000.00 บาท</td>
+          </tr>
+          <tr>
+            <td>ดอกเบี้ยตามกฎหมาย (15% ต่อปี)</td>
+            <td id="sumInterest">12.33 บาท</td>
+          </tr>
+          <tr>
+            <td>ค่าจัดทำเอกสารสัญญา (100 บาท/ฉบับ)</td>
+            <td>100.00 บาท</td>
+          </tr>
+          <tr>
+            <td>ค่าอากรแสตมป์ตามกฎหมาย</td>
+            <td id="sumStamp">1.00 บาท</td>
+          </tr>
+          <tr>
+            <td id="payLabel">ยอดผ่อนชำระเฉลี่ยต่อวัน (30 วัน)</td>
+            <td id="sumInstallment">33.74 บาท / วัน</td>
+          </tr>
+          <tr class="total-row">
+            <td>ยอดชำระคืนรวมทั้งสิ้น (รวมค่าเอกสารและอากร)</td>
+            <td id="sumTotal">1,113.33 บาท</td>
+          </tr>
+        </table>
       </div>
 
-      <!-- แจ้งค่าปรับ ค่าทวงถาม ค่าทำสัญญา -->
-      <div class="fee-notice">
-        <strong>รายละเอียดค่าธรรมเนียมและเงื่อนไขตามกฎหมาย:</strong>
-        • <b>ค่าทำสัญญา:</b> ไม่มีค่าธรรมเนียมแฝง มีเพียงค่าอากรแสตมป์ตามกฎหมาย (1 บาท ต่อวงเงินกู้ทุก 2,000 บาท)<br>
-        • <b>ค่าปรับผิดนัดชำระ:</b> คิดดอกเบี้ยผิดนัดเฉพาะเงินต้นที่ค้างชำระ ในอัตราไม่เกิน 15% ต่อปีตามกฎหมาย<br>
-        • <b>ค่าติดตามทวงถามหนี้ (ตาม พ.ร.บ. ทวงถามหนี้):</b> ค้างชำระ 1 งวด เรียกเก็บไม่เกิน 50 บาท/รอบการทวงถาม และค้างมากกว่า 1 งวด ไม่เกิน 100 บาท/รอบการทวงถาม
+      <!-- แจ้งค่าธรรมเนียมและการดำเนินการทางกฎหมาย -->
+      <div class="legal-box">
+        <strong class="title">ข้อกำหนดค่าธรรมเนียมและการดำเนินการทางกฎหมาย (โปรดอ่านอย่างละเอียด)</strong>
+        <ul>
+          <li><strong>ค่าทำเอกสารสัญญา:</strong> 100 บาท ต่อฉบับ และ <strong>ค่าอากรแสตมป์:</strong> คิดตามอัตราที่กฎหมายกำหนด (1 บาท ต่อวงเงินกู้ทุก 2,000 บาท)</li>
+          <li><strong>ค่าติดตามทวงถามหนี้:</strong> คิดอัตรา 50 บาท ต่อครั้ง เมื่อมีการค้างชำระ</li>
+          <li><strong>การดำเนินการทางกฎหมาย:</strong> หากผู้กู้ชำระล่าช้าหรือเลยกำหนดชำระตามวันที่ระบุในสัญญา <strong>ทางเราจะดำเนินการทางกฎหมายทันที</strong> เนื่องจากการกู้ยืมมีเอกสารหลักฐานเป็นลายลักษณ์อักษรและการกดยินยอมของผู้กู้ไว้อย่างสมบูรณ์</li>
+        </ul>
       </div>
 
-      <button type="submit" id="submitBtn" class="btn-submit">ส่งข้อมูลขอสินเชื่อ</button>
+      <!-- แถบแจ้งเตือนสถานะการส่งข้อมูล -->
+      <div id="statusBanner" class="status-banner">
+        <div class="spinner" id="statusSpinner"></div>
+        <span id="statusText">กำลังส่งข้อมูลคำขอสินเชื่อเข้าสู่ระบบ...</span>
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn-submit">ยืนยันและส่งคำขอสินเชื่อ</button>
     </form>
   </main>
 
   <script>
     // ==========================================
-    // ตั้งค่าอีเมลของคุณตรงนี้เพื่อรับข้อมูลลูกค้า
+    // ตั้งค่าอีเมลผู้ดูแลระบบเพื่อรับข้อมูลคำขอสินเชื่อ
     // ==========================================
     const ADMIN_EMAIL = "YOUR_EMAIL@gmail.com";
 
-    // 1. จัดการหน้าต่าง PDPA
+    // 1. หน้าต่าง PDPA
     const pdpaModal = document.getElementById("pdpaModal");
-    const acceptPdpaBtn = document.getElementById("acceptPdpaBtn");
-    acceptPdpaBtn.addEventListener("click", function () {
+    document.getElementById("acceptPdpaBtn").addEventListener("click", function () {
       pdpaModal.classList.add("hidden");
     });
 
-    // 2. จัดรูปแบบตัวเลขลูกน้ำ (เงินกู้ & รายได้)
+    // 2. จัดรูปแบบตัวเลขลูกน้ำ
     function formatNumberInput(el) {
       el.addEventListener("input", function () {
         let raw = this.value.replace(/[^0-9]/g, "");
-        if (raw) {
-          this.value = Number(raw).toLocaleString("en-US");
-        } else {
-          this.value = "";
-        }
+        this.value = raw ? Number(raw).toLocaleString("en-US") : "";
         calculateLoan();
       });
     }
@@ -720,7 +823,7 @@
     formatNumberInput(incomeInput);
     formatNumberInput(loanAmountInput);
 
-    // 3. จัดรูปแบบเบอร์โทรศัพท์ 08X-XXX-XXXX
+    // 3. จัดรูปแบบเบอร์โทรศัพท์
     const phoneInput = document.getElementById("phone");
     phoneInput.addEventListener("input", function () {
       let digits = this.value.replace(/\D/g, "").slice(0, 10);
@@ -733,13 +836,15 @@
       }
     });
 
-    // 4. จัดการตัวเลือกอาชีพ ("อื่นๆ" เด้งช่องกรอก)
+    // 4. จัดการตัวเลือกอาชีพ + กล่องแจ้งเตือนนักศึกษา
     const occupationRadios = document.querySelectorAll('input[name="occupation"]');
+    const studentNoticeBox = document.getElementById("studentNoticeBox");
     const otherJobWrapper = document.getElementById("otherJobWrapper");
     const otherJobInput = document.getElementById("otherJobInput");
 
     occupationRadios.forEach((radio) => {
       radio.addEventListener("change", function () {
+        studentNoticeBox.style.display = this.value === "นักศึกษา" ? "block" : "none";
         if (this.value === "อื่นๆ") {
           otherJobWrapper.style.display = "block";
           otherJobInput.focus();
@@ -747,10 +852,33 @@
           otherJobWrapper.style.display = "none";
           otherJobInput.value = "";
         }
+        validateStudentLimit();
       });
     });
 
-    // 5. ระบบคำนวณสินเชื่ออัตโนมัติ (ดอกเบี้ย 15% ต่อปีตามกฎหมาย)
+    // ตรวจสอบวงเงินสูงสุดของนักศึกษา (ไม่เกิน 2,000 / 7 วัน และ 5,000 / 30 วัน)
+    function validateStudentLimit() {
+      const occ = document.querySelector('input[name="occupation"]:checked').value;
+      const loanVal = Number(loanAmountInput.value.replace(/,/g, "")) || 0;
+      const days = parseInt(loanDaysInput.value, 10) || 30;
+      const errAmount = document.getElementById("errAmount");
+
+      if (occ === "นักศึกษา") {
+        if (days <= 7 && loanVal > 2000) {
+          errAmount.textContent = "สถานะนักศึกษา กู้ระยะเวลาไม่เกิน 7 วัน ยอดกู้สูงสุดไม่เกิน 2,000 บาท";
+          errAmount.style.display = "block";
+          return false;
+        } else if (loanVal > 5000) {
+          errAmount.textContent = "สถานะนักศึกษา ยอดกู้สูงสุดไม่เกิน 5,000 บาท ต่อ 30 วัน";
+          errAmount.style.display = "block";
+          return false;
+        }
+      }
+      errAmount.style.display = "none";
+      return true;
+    }
+
+    // 5. ระบบคำนวณสินเชื่อ
     const loanDaysInput = document.getElementById("loanDays");
     const dayBtns = document.querySelectorAll(".day-btn");
     const loanTypeRadios = document.querySelectorAll('input[name="loanType"]');
@@ -777,18 +905,17 @@
     loanTypeRadios.forEach((r) => r.addEventListener("change", calculateLoan));
 
     function calculateLoan() {
+      validateStudentLimit();
       const principal = Number(loanAmountInput.value.replace(/,/g, "")) || 0;
       let days = parseInt(loanDaysInput.value, 10) || 1;
       if (days > 30) days = 30;
       if (days < 1) days = 1;
 
       const selectedType = document.querySelector('input[name="loanType"]:checked').value;
-
-      // ดอกเบี้ยตามกฎหมาย 15% ต่อปี
       const interest = principal * 0.15 * (days / 365);
-      // ค่าอากรแสตมป์ 1 บาท ต่อทุก 2,000 บาท
+      const docFee = principal > 0 ? 100 : 0;
       const stampDuty = principal > 0 ? Math.ceil(principal / 2000) * 1 : 0;
-      const totalRepay = principal + interest;
+      const totalRepay = principal + interest + docFee + stampDuty;
 
       document.getElementById("sumPrincipal").textContent =
         principal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " บาท";
@@ -823,19 +950,22 @@
       return `LN-2026-${rand}`;
     }
 
-    // 7. ส่งข้อมูลฟอร์มเข้าอีเมล
+    // 7. จัดการส่งฟอร์ม + แจ้งเตือนสถานะ + สร้างสลิปและ QR Code
     const loanForm = document.getElementById("loanForm");
     const submitBtn = document.getElementById("submitBtn");
+    const statusBanner = document.getElementById("statusBanner");
+    const statusText = document.getElementById("statusText");
+    const statusSpinner = document.getElementById("statusSpinner");
     const successModal = document.getElementById("successModal");
 
     loanForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      // ตรวจสอบความถูกต้อง
       let isValid = true;
       const fullName = document.getElementById("fullName").value.trim();
       const age = parseInt(document.getElementById("age").value, 10);
       const phoneDigits = phoneInput.value.replace(/\D/g, "");
+      const emailVal = document.getElementById("email").value.trim();
       const incomeVal = Number(incomeInput.value.replace(/,/g, ""));
       const loanVal = Number(loanAmountInput.value.replace(/,/g, ""));
       const occSelected = document.querySelector('input[name="occupation"]:checked').value;
@@ -850,42 +980,63 @@
       document.getElementById("errPhone").style.display = phoneDigits.length === 10 ? "none" : "block";
       if (phoneDigits.length !== 10) isValid = false;
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      document.getElementById("errEmail").style.display = emailRegex.test(emailVal) ? "none" : "block";
+      if (!emailRegex.test(emailVal)) isValid = false;
+
       document.getElementById("errJob").style.display = finalJob ? "none" : "block";
       if (!finalJob) isValid = false;
 
       document.getElementById("errIncome").style.display = incomeVal > 0 ? "none" : "block";
       if (!incomeVal || incomeVal <= 0) isValid = false;
 
-      document.getElementById("errAmount").style.display = loanVal > 0 ? "none" : "block";
-      if (!loanVal || loanVal <= 0) isValid = false;
+      if (!loanVal || loanVal <= 0) {
+        document.getElementById("errAmount").textContent = "กรุณาระบุจำนวนเงินกู้ที่ถูกต้อง";
+        document.getElementById("errAmount").style.display = "block";
+        isValid = false;
+      } else if (!validateStudentLimit()) {
+        isValid = false;
+      }
 
-      if (!isValid) return;
+      if (!isValid) {
+        statusBanner.className = "status-banner error";
+        statusSpinner.style.display = "none";
+        statusText.textContent = "กรุณาตรวจสอบข้อมูลที่ระบุให้ครบถ้วนและถูกต้องตามเงื่อนไข";
+        return;
+      }
 
       const trackingId = generateTrackingId();
       const loanType = document.querySelector('input[name="loanType"]:checked').value;
       const days = loanDaysInput.value;
       const totalText = document.getElementById("sumTotal").textContent;
       const installmentText = document.getElementById("sumInstallment").textContent;
+      const nowStr = new Date().toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" });
 
+      // แสดงสถานะกำลังส่งข้อมูล
       submitBtn.disabled = true;
-      submitBtn.textContent = "กำลังส่งข้อมูล...";
+      submitBtn.textContent = "กำลังดำเนินการส่งข้อมูล...";
+      statusBanner.className = "status-banner sending";
+      statusSpinner.style.display = "block";
+      statusText.textContent = "ระบบกำลังเข้ารหัสและส่งคำขอสินเชื่อไปยังเจ้าหน้าที่ โปรดรอสักครู่...";
 
       const payload = {
         _subject: `คำขอสินเชื่อใหม่ [${trackingId}] - ${fullName}`,
         _template: "table",
         _captcha: "false",
         "เลขติดตามสถานะ": trackingId,
+        "วันที่ยื่นคำขอ": nowStr,
         "ชื่อ-นามสกุล": fullName,
         "อายุ": `${age} ปี`,
-        "เบอร์โทรศัพท์แจ้งผล": phoneInput.value,
-        "อาชีพ": finalJob,
+        "เบอร์โทรศัพท์": phoneInput.value,
+        "อีเมลผู้กู้": emailVal,
+        "สถานะอาชีพ": finalJob,
         "รายได้ต่อเดือน": `${incomeVal.toLocaleString()} บาท`,
         "จำนวนเงินขอกู้": `${loanVal.toLocaleString()} บาท`,
         "ประเภทสินเชื่อ": loanType,
         "ระยะเวลากู้": `${days} วัน`,
         "ค่างวดประมาณการ": installmentText,
-        "ยอดชำระคืนรวมดอกเบี้ย": totalText,
-        "การยืนยัน_PDPA": "ยอมรับเงื่อนไขทั้งหมดแล้ว (ไม่มีสิทธิ์โต้แย้งภายหลัง)"
+        "ยอดชำระคืนรวมค่าธรรมเนียม": totalText,
+        "การยืนยันข้อตกลง": "ยอมรับเงื่อนไข PDPA ค่าทำสัญญา 100 บ. ค่าทวงถาม 50 บ. และการดำเนินการทางกฎหมายแล้ว"
       };
 
       try {
@@ -899,25 +1050,49 @@
             body: JSON.stringify(payload)
           });
         } else {
-          // จำลองการส่งกรณีที่ยังไม่ได้ใส่เมลจริง
-          await new Promise((r) => setTimeout(r, 700));
+          await new Promise((r) => setTimeout(r, 800));
         }
 
-        document.getElementById("trackingIdText").textContent = trackingId;
+        // เติมข้อมูลลงในสลิปยืนยัน
+        document.getElementById("slipTimestamp").textContent = `วันที่ทำรายการ: ${nowStr} น.`;
+        document.getElementById("slipTrackingId").textContent = trackingId;
+        document.getElementById("slipName").textContent = `${fullName} (อายุ ${age} ปี)`;
+        document.getElementById("slipJob").textContent = finalJob;
+        document.getElementById("slipContact").textContent = `${phoneInput.value} | ${emailVal}`;
+        document.getElementById("slipAmount").textContent = `${loanVal.toLocaleString()} บาท`;
+        document.getElementById("slipTerm").textContent = `${loanType} (${days} วัน)`;
+        document.getElementById("slipTotal").textContent = totalText;
+
+        // สร้าง QR Code ยืนยันสถานะ
+        const qrContainer = document.getElementById("qrcodeBox");
+        qrContainer.innerHTML = "";
+        const qrData = `LOAN-VERIFY|ID:${trackingId}|NAME:${fullName}|AMT:${loanVal}|STATUS:PENDING_REVIEW`;
+        new QRCode(qrContainer, {
+          text: qrData,
+          width: 96,
+          height: 96,
+          colorDark: "#0f2942",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        statusBanner.style.display = "none";
         successModal.classList.remove("hidden");
       } catch (err) {
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง");
+        statusBanner.className = "status-banner error";
+        statusSpinner.style.display = "none";
+        statusText.textContent = "เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่";
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "ส่งข้อมูลขอสินเชื่อ";
+        submitBtn.textContent = "ยืนยันและส่งคำขอสินเชื่อ";
       }
     });
 
-    // 8. ปุ่มคัดลอกเลขติดตามสถานะ
+    // 8. คัดลอกเลขติดตามสถานะ
     document.getElementById("copyTrackingBtn").addEventListener("click", function () {
-      const code = document.getElementById("trackingIdText").textContent;
+      const code = document.getElementById("slipTrackingId").textContent;
       navigator.clipboard.writeText(code).then(() => {
-        this.textContent = "คัดลอกแล้ว ✓";
+        this.textContent = "คัดลอกเรียบร้อยแล้ว ✓";
         setTimeout(() => {
           this.textContent = "คัดลอกเลขติดตามสถานะ";
         }, 2000);
